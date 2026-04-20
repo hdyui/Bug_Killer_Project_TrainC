@@ -248,6 +248,9 @@ void formatDateTime(time_t t, char *buffer) {
      * strftime(buffer, 20, "%d/%m/%Y %H:%M", tm_info);
      */
 }
+void getCurrentTime(int i){
+    orders[i].createdDate = time(NULL);
+}
 
 void getTodayString(char *buffer) {
     /* TODO:
@@ -510,6 +513,8 @@ int createRepairOrder(void) {
      * 7. orderCount++; customers[cIdx].orderCount++;
      * 8. saveOrders(); saveCustomers(); printSuccess(); return 1
      */
+
+     
     return 0; /* placeholder */
 }
 
@@ -549,14 +554,14 @@ int findOrderById(const char *orderId) {
 }
 
 int findOrdersByPhone(const char *phone, int *result, int maxResult) {
-    /* TODO:
-     * int count = 0;
-     * for (int i = 0; i < orderCount && count < maxResult; i++)
-     *     if (strcmp(orders[i].customerPhone, phone) == 0)
-     *         result[count++] = i;
-     * return count;
-     */
-    return 0; /* placeholder */
+    int index = -1;
+    for(int i = 0; i < orderCount; i++){
+        if(strcmp(orders[i].customerPhone, phone) == 0){
+            index = i;
+            break;
+        }
+    }
+    return index; /* placeholder */
 }
 
 int findOrdersByPlate(const char *plate, int *result, int maxResult) {
