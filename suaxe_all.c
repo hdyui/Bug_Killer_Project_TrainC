@@ -157,7 +157,7 @@ void   listAllServices(void);
 
 /* repair */
 void   initOrders(void);
-int    createRepairOrder(void);
+void   createRepairOrder(void);
 int    addItemToOrder(int idx);
 int    updateOrderStatus(void);
 int    findOrderById(const char *orderId);
@@ -494,7 +494,7 @@ void listAllServices(void) {
 void initOrders(void) {
     /* TODO: orderCount = 0; memset(orders, 0, sizeof(orders)); */
 }
-int createRepairOrder(void) {
+void createRepairOrder(void) {
     /* TODO:
      * 1. Kiểm tra orderCount < MAX_REPAIR_ORDERS
      * 2. Nhập SĐT, findCustomerByPhone() -> nếu -1 báo lỗi return 0
@@ -512,20 +512,76 @@ int createRepairOrder(void) {
      * 7. orderCount++; customers[cIdx].orderCount++;
      * 8. saveOrders(); saveCustomers(); printSuccess(); return 1
      */
-    int isCreated = 1;
-    if(orderCount < MAX_REPAIR_ORDERS){
-        isCreated = 0;
-        return isCreated;
+    if(orderCount > MAX_REPAIR_ORDERS){
+        printf("So luong vuot muc toi da\n");
+        return;
     }
+    int index;
     char phoneNumber[PHONE_LEN];
-    printf("Nhap so dien thoai khach hang: ");
-    scanf("%[^\n]", phoneNumber);
-    //tạm thời chưa check được do chưa build hàm findCustomerByPhone
+    int isConfirm;
+    do{
+        printf("Nhap so dien thoai khach hang: ");
+        scanf("%[^\n]", phoneNumber);
+        
+        printf("Xac nhan so dien thoai ban muon tim: %s\n", phoneNumber);
+        printf("[1] Xac nhan\n");
+        printf("[0] Nhap lai\n");
+        printf("Nhap lua chon: ");
+        scanf("%d", &isConfirm);
+        while (getchar() != '\n');
+        if(findCustomerByPhone(phoneNumber) == -1){
+            printf("Khong ton tai so dien nay nay: %s\n", phoneNumber);
+        }
+        else{
+            printf("%-20s %-20s %-20s %-20s %-20s %-20d\n"
+            "ID", "Name", "Phone", "Car plate", "Car type", "Order count");
+            index = findCustomerByPhone(phoneNumber);
+            printf("%-20s %-20s %-15s %-15s %-25s %-20d\n",
+                customers[index].customerId, customers[index].fullName,
+                customers[index].phoneNumber, customers[index].carPlate,
+                customers[index].carType, customers[index].orderCount);
+        }
+        if(isConfirm != 1){
+                printf("Vui long nhap [1] hoac [0]\n");
+        }
+    }
+    while(isConfirm == 0 || isConfirm != 1 || findCustomerByPhone(phoneNumber) == -1);
+    generateOrderId(index);
+    strcpy(orders[index].customerPhone, customers[index].phoneNumber);
+    char symptom[SYMPTOM_LEN];
+    do{
+        printf("Nhap tinh trang xe cua ban: ");
+        scanf("%[^\n]", symptom);
+    }
+    while(strlen(symptom) == 0);
+    strcpy(orders[index].symptom, symptom);
+    orders[index].status = STATUS_RECEIVED;
+    orders[index].createdDate = time(NULL);
+    orders[index].itemCount = 0;
+    orders[index].totalAmount = 0;
+    for(int i = 0; i < serviceCount; i++){
+        int choice;
+        if(services[i].isActive == 1){
+            do{
+                printf("%-20s %-20s %-20s %-20s\n"
+                "ID", "Name", "Unit price", "Active");
+                printf("[1] Su dung dich vu nay\n");
+                printf("[0] Bo qua dich vu nay\n");
+                printf("Nhap lua chon: ");
+                scanf("%d", &choice);
+            }
+            while(choice != 0 || choice != 1);
+            if(choice == 1){
+                //hàm này chưa build
+                addItemToOrder(orderCount);
+            }
+        }
+    }
     
+
     
 
      
-    return isCreated; 
 }
 
 int addItemToOrder(int idx) {
@@ -732,12 +788,16 @@ static void menuRepair(void) {
         printf("  [0] Quay lai\n");
         printDivider();
         printf("  Lua chon: ");
-        scanf(" %d", &choice);
+        scanf("%d", &choice);
         while (getchar() != '\n');
 
         switch (choice) {
-            case 1: createRepairOrder();   break;
-            case 2: updateOrderStatus();   break;
+            case 1: 
+                createRepairOrder();   
+                break;
+            case 2: 
+                updateOrderStatus();   
+                break;
             case 3: {
                 char oid[ID_LEN];
                 printf("  Nhap ma phieu: ");
@@ -747,7 +807,9 @@ static void menuRepair(void) {
                 else printOrder(&orders[idx]);
                 break;
             }
-            case 4: listOrders(-1);        break;
+            case 4: 
+                listOrders(-1);        
+                break;
             case 5: {
                 int st;
                 printf("  Trang thai [0=Tiep nhan, 1=Dang sua, 2=Hoan thanh]: ");
@@ -756,10 +818,16 @@ static void menuRepair(void) {
                 listOrders(st);
                 break;
             }
-            case 6: viewCustomerHistory(); break;
-            case 7: searchOrderMenu();     break;
-            case 0: break;
-            default: printError("Lua chon khong hop le.");
+            case 6: 
+                viewCustomerHistory(); 
+                break;
+            case 7: 
+                searchOrderMenu();     
+                break;
+            case 0: 
+                break;
+            default: 
+                printError("Lua chon khong hop le.");
         }
     } while (choice != 0);
 }
@@ -811,12 +879,22 @@ int main(void) {
         printf("  Lua chon: ");
         scanf(" %d", &choice);
         while (getchar() != '\n');
-
         switch (choice) {
-            case 1: menuCustomer(); break;
-            case 2: menuRepair();   break;
-            case 3: menuService();  break;
-            case 4: reportMenu();   break;
+            case 1:
+                menuCustomer(); 
+                break;
+            
+            case 2:
+                menuRepair();   
+                break;
+            
+            case 3:
+                menuService();  
+                break;
+            
+            case 4: 
+                reportMenu();   
+                break;
             case 0:
                 saveAllData();
                 printSuccess("Da luu du lieu. Tam biet!");
