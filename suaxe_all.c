@@ -396,11 +396,14 @@ int editCustomer(void) {
 }
 
 int findCustomerByPhone(const char *phone) {
-    for (int i = 0; i < customerCount; i++)
-        if (strcmp(customers[i].phoneNumber, phone) == 0) return i;
-    return -1;
-
-    return -1; /* placeholder */
+    int index = -1;
+    for (int i = 0; i < customerCount; i++){
+        if (strcmp(customers[i].phoneNumber, phone) == 0){
+            index = i;
+            break;
+        }
+    }
+    return index;
 }
 
 int findCustomerByPlate(const char *plate) {
