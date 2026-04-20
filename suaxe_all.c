@@ -156,6 +156,7 @@ int    findServiceById(const char *serviceId);
 void   listAllServices(void);
 
 /* repair */
+void   initOrders(void);
 int    createRepairOrder(void);
 int    addItemToOrder(int idx);
 int    updateOrderStatus(void);
@@ -395,11 +396,10 @@ int editCustomer(void) {
 }
 
 int findCustomerByPhone(const char *phone) {
-    /* TODO:
-     * for (int i = 0; i < customerCount; i++)
-     *     if (strcmp(customers[i].phoneNumber, phone) == 0) return i;
-     * return -1;
-     */
+    for (int i = 0; i < customerCount; i++)
+        if (strcmp(customers[i].phoneNumber, phone) == 0) return i;
+    return -1;
+
     return -1; /* placeholder */
 }
 
@@ -488,7 +488,9 @@ void listAllServices(void) {
  * SECTION 9: REPAIR ORDER
  * ========================================================= */
 
-
+void initOrders(void) {
+    /* TODO: orderCount = 0; memset(orders, 0, sizeof(orders)); */
+}
 int createRepairOrder(void) {
     /* TODO:
      * 1. Kiểm tra orderCount < MAX_REPAIR_ORDERS
