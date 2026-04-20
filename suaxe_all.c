@@ -116,7 +116,7 @@ int    strCmpIgnoreCase(const char *a, const char *b);
 void   strTrim(char *str);
 void   readLine(char *buffer, int maxLen);
 void   generateCustomerId(int n, char *buffer);
-void   generateOrderId(int n, char *buffer);
+void   generateOrderId(int i);
 void   generateServiceId(int n, char *buffer);
 void   formatDateTime(time_t t, char *buffer);
 void   getTodayString(char *buffer);
@@ -233,12 +233,13 @@ void generateCustomerId(int n, char *buffer) {
     /* TODO: snprintf(buffer, ID_LEN, "CU%06d", n); */
 }
 
-void generateOrderId(int n, char *buffer) {
-    /* TODO: snprintf(buffer, ID_LEN, "RO%06d", n); */
+void generateOrderId(int i) {
+    sprintf(orders[i].orderId,"RO%06d", ++orderCount);
 }
 
 void generateServiceId(int n, char *buffer) {
     /* TODO: snprintf(buffer, ID_LEN, "SV%06d", n); */
+    
 }
 
 void formatDateTime(time_t t, char *buffer) {
