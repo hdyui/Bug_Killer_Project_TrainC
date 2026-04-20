@@ -156,7 +156,6 @@ int    findServiceById(const char *serviceId);
 void   listAllServices(void);
 
 /* repair */
-void   initOrders(void);
 int    createRepairOrder(void);
 int    addItemToOrder(int idx);
 int    updateOrderStatus(void);
@@ -248,9 +247,7 @@ void formatDateTime(time_t t, char *buffer) {
      * strftime(buffer, 20, "%d/%m/%Y %H:%M", tm_info);
      */
 }
-void getCurrentTime(int i){
-    orders[i].createdDate = time(NULL);
-}
+
 
 void getTodayString(char *buffer) {
     /* TODO:
@@ -491,9 +488,6 @@ void listAllServices(void) {
  * SECTION 9: REPAIR ORDER
  * ========================================================= */
 
-void initOrders(void) {
-    /* TODO: orderCount = 0; memset(orders, 0, sizeof(orders)); */
-}
 
 int createRepairOrder(void) {
     /* TODO:
@@ -513,9 +507,20 @@ int createRepairOrder(void) {
      * 7. orderCount++; customers[cIdx].orderCount++;
      * 8. saveOrders(); saveCustomers(); printSuccess(); return 1
      */
+    int isCreated = 1;
+    if(orderCount < MAX_REPAIR_ORDERS){
+        isCreated = 0;
+        return isCreated;
+    }
+    char phoneNumber[PHONE_LEN];
+    printf("Nhap so dien thoai khach hang: ");
+    scanf("%[^\n]", phoneNumber);
+    //tạm thời chưa check được do chưa build hàm findCustomerByPhone
+    
+    
 
      
-    return 0; /* placeholder */
+    return isCreated; 
 }
 
 int addItemToOrder(int idx) {
@@ -561,7 +566,7 @@ int findOrdersByPhone(const char *phone, int *result, int maxResult) {
             break;
         }
     }
-    return index; /* placeholder */
+    return index; 
 }
 
 int findOrdersByPlate(const char *plate, int *result, int maxResult) {
@@ -786,7 +791,6 @@ int main(void) {
 
     initCustomers();
     initServices();
-    initOrders();
 
     ensureDataDir();
     loadAllData();
