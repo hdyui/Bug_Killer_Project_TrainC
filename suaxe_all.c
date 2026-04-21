@@ -116,7 +116,7 @@ int    strCmpIgnoreCase(const char *a, const char *b);
 void   strTrim(char *str);
 void   readLine(char *buffer, int maxLen);
 void   generateCustomerId(int n, char *buffer);
-void   generateOrderId(int n, char *buffer);
+void   generateOrderId();
 void   generateServiceId(int n, char *buffer);
 void   formatDateTime(time_t t, char *buffer);
 void   getTodayString(char *buffer);
@@ -157,7 +157,7 @@ void   listAllServices(void);
 
 /* repair */
 void   initOrders(void);
-int    createRepairOrder(void);
+void   createRepairOrder(void);
 int    addItemToOrder(int idx);
 int    updateOrderStatus(void);
 int    findOrderById(const char *orderId);
@@ -233,12 +233,13 @@ void generateCustomerId(int n, char *buffer) {
     /* TODO: snprintf(buffer, ID_LEN, "CU%06d", n); */
 }
 
-void generateOrderId(int n, char *buffer) {
-    /* TODO: snprintf(buffer, ID_LEN, "RO%06d", n); */
+void generateOrderId() {
+    sprintf(orders[orderCount].orderId,"RO%06d", orderCount + 1);
 }
 
 void generateServiceId(int n, char *buffer) {
     /* TODO: snprintf(buffer, ID_LEN, "SV%06d", n); */
+    
 }
 
 void formatDateTime(time_t t, char *buffer) {
@@ -247,6 +248,7 @@ void formatDateTime(time_t t, char *buffer) {
      * strftime(buffer, 20, "%d/%m/%Y %H:%M", tm_info);
      */
 }
+
 
 void getTodayString(char *buffer) {
     /* TODO:
@@ -394,12 +396,14 @@ int editCustomer(void) {
 }
 
 int findCustomerByPhone(const char *phone) {
-    /* TODO:
-     * for (int i = 0; i < customerCount; i++)
-     *     if (strcmp(customers[i].phoneNumber, phone) == 0) return i;
-     * return -1;
-     */
-    return -1; /* placeholder */
+    int index = -1;
+    for (int i = 0; i < customerCount; i++){
+        if (strcmp(customers[i].phoneNumber, phone) == 0){
+            index = i;
+            break;
+        }
+    }
+    return index;
 }
 
 int findCustomerByPlate(const char *plate) {
@@ -490,8 +494,7 @@ void listAllServices(void) {
 void initOrders(void) {
     /* TODO: orderCount = 0; memset(orders, 0, sizeof(orders)); */
 }
-
-int createRepairOrder(void) {
+void createRepairOrder(void) {
     /* TODO:
      * 1. Kiểm tra orderCount < MAX_REPAIR_ORDERS
      * 2. Nhập SĐT, findCustomerByPhone() -> nếu -1 báo lỗi return 0
@@ -509,7 +512,84 @@ int createRepairOrder(void) {
      * 7. orderCount++; customers[cIdx].orderCount++;
      * 8. saveOrders(); saveCustomers(); printSuccess(); return 1
      */
-    return 0; /* placeholder */
+    if(orderCount > MAX_REPAIR_ORDERS){
+        printf("So luong vuot muc toi da\n");
+        return;
+    }
+    int index; //vị trí khách hàng trong mảng 
+    char phoneNumber[PHONE_LEN];
+    int isConfirm;
+    do{
+        printf("Nhap so dien thoai khach hang: ");
+        scanf("%[^\n]", phoneNumber);
+        
+        printf("Xac nhan so dien thoai ban muon tim: %s\n", phoneNumber);
+        printf("[1] Xac nhan\n");
+        printf("[0] Nhap lai\n");
+        printf("Nhap lua chon: ");
+        scanf("%d", &isConfirm);
+        while (getchar() != '\n');
+        if(findCustomerByPhone(phoneNumber) == -1){
+            printf("Khong ton tai so dien nay nay: %s\n", phoneNumber);
+        }
+        else{
+            printf("%-20s %-20s %-20s %-20s %-20s %-20d\n"
+            "ID", "Name", "Phone", "Car plate", "Car type", "Order count");
+            index = findCustomerByPhone(phoneNumber);
+            printf("%-20s %-20s %-15s %-15s %-25s %-20d\n",
+                customers[index].customerId, customers[index].fullName,
+                customers[index].phoneNumber, customers[index].carPlate,
+                customers[index].carType, customers[index].orderCount);
+        }
+        if(isConfirm != 1){
+                printf("Vui long nhap [1] hoac [0]\n");
+        }
+    }
+    while(isConfirm != 1 || findCustomerByPhone(phoneNumber) == -1);
+    generateOrderId();
+    strcpy(orders[orderCount].customerPhone, customers[index].phoneNumber);
+    char symptom[SYMPTOM_LEN];
+    do{
+        printf("Nhap tinh trang xe cua ban: ");
+        scanf("%[^\n]", symptom);
+    }
+    while(strlen(symptom) == 0);
+    strcpy(orders[orderCount].symptom, symptom);
+    orders[orderCount].status = STATUS_RECEIVED;
+    orders[orderCount].createdDate = time(NULL);
+    orders[orderCount].itemCount = 0;
+    orders[orderCount].totalAmount = 0;
+
+    printf("%-20s %-20s %-20s %-20s\n"
+        "ID", "Name", "Unit price", "Active");
+    for(int i = 0; i < serviceCount; i++){
+        int choice;
+        if(services[i].isActive == 1){
+            
+            do{
+                printf("%-20s %-20s %-20s %-20s\n",
+                services[i].serviceId, services[i].name, 
+                services[i].unitPrice, services[i].isActive);
+
+                printf("[1] Su dung dich vu nay\n");
+                printf("[0] Bo qua dich vu nay\n");
+                printf("Nhap lua chon: ");
+                scanf("%d", &choice);
+            }
+            while(choice != 0 && choice != 1);
+            if(choice == 1){
+                //hàm này chưa build
+                addItemToOrder(orderCount);
+            }
+        }
+    }
+    orderCount++;
+    customers[index].orderCount++;
+
+
+    
+
+     
 }
 
 int addItemToOrder(int idx) {
@@ -548,14 +628,14 @@ int findOrderById(const char *orderId) {
 }
 
 int findOrdersByPhone(const char *phone, int *result, int maxResult) {
-    /* TODO:
-     * int count = 0;
-     * for (int i = 0; i < orderCount && count < maxResult; i++)
-     *     if (strcmp(orders[i].customerPhone, phone) == 0)
-     *         result[count++] = i;
-     * return count;
-     */
-    return 0; /* placeholder */
+    int index = -1;
+    for(int i = 0; i < orderCount; i++){
+        if(strcmp(orders[i].customerPhone, phone) == 0){
+            index = i;
+            break;
+        }
+    }
+    return index; 
 }
 
 int findOrdersByPlate(const char *plate, int *result, int maxResult) {
@@ -716,12 +796,16 @@ static void menuRepair(void) {
         printf("  [0] Quay lai\n");
         printDivider();
         printf("  Lua chon: ");
-        scanf(" %d", &choice);
+        scanf("%d", &choice);
         while (getchar() != '\n');
 
         switch (choice) {
-            case 1: createRepairOrder();   break;
-            case 2: updateOrderStatus();   break;
+            case 1: 
+                createRepairOrder();   
+                break;
+            case 2: 
+                updateOrderStatus();   
+                break;
             case 3: {
                 char oid[ID_LEN];
                 printf("  Nhap ma phieu: ");
@@ -731,7 +815,9 @@ static void menuRepair(void) {
                 else printOrder(&orders[idx]);
                 break;
             }
-            case 4: listOrders(-1);        break;
+            case 4: 
+                listOrders(-1);        
+                break;
             case 5: {
                 int st;
                 printf("  Trang thai [0=Tiep nhan, 1=Dang sua, 2=Hoan thanh]: ");
@@ -740,10 +826,16 @@ static void menuRepair(void) {
                 listOrders(st);
                 break;
             }
-            case 6: viewCustomerHistory(); break;
-            case 7: searchOrderMenu();     break;
-            case 0: break;
-            default: printError("Lua chon khong hop le.");
+            case 6: 
+                viewCustomerHistory(); 
+                break;
+            case 7: 
+                searchOrderMenu();     
+                break;
+            case 0: 
+                break;
+            default: 
+                printError("Lua chon khong hop le.");
         }
     } while (choice != 0);
 }
@@ -780,7 +872,6 @@ int main(void) {
 
     initCustomers();
     initServices();
-    initOrders();
 
     ensureDataDir();
     loadAllData();
@@ -796,12 +887,22 @@ int main(void) {
         printf("  Lua chon: ");
         scanf(" %d", &choice);
         while (getchar() != '\n');
-
         switch (choice) {
-            case 1: menuCustomer(); break;
-            case 2: menuRepair();   break;
-            case 3: menuService();  break;
-            case 4: reportMenu();   break;
+            case 1:
+                menuCustomer(); 
+                break;
+            
+            case 2:
+                menuRepair();   
+                break;
+            
+            case 3:
+                menuService();  
+                break;
+            
+            case 4: 
+                reportMenu();   
+                break;
             case 0:
                 saveAllData();
                 printSuccess("Da luu du lieu. Tam biet!");
