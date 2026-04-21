@@ -218,6 +218,33 @@ void strTrim(char *str) {
      * 2. Dịch chuyển chuỗi về đầu nếu có khoảng trắng phía trước
      * 3. Tìm từ cuối về, cắt bỏ khoảng trắng cuối bằng cách đặt '\0'
      */
+     
+    if (str == NULL) return;
+
+    char *start = str;
+
+    // 1. Bỏ khoảng trắng đầu
+    while (*start && isspace((unsigned char)*start)) {
+        start++;
+    }
+
+    // 2. Dồn chuỗi về đầu (nếu có khoảng trắng đầu)
+    if (start != str) {
+        memmove(str, start, strlen(start) + 1);
+		/* 
+		- memmove là copy từ chỗ A sang chỗ B; và dù A và B có ghi đè lên nhau cũng không làm hỏng dữ liệu
+        - memmove sẽ sao chép toàn bộ nội dung chuỗi mà start trỏ tới (bao gồm cả ký tự '\0') vào vùng nhớ bắt đầu tại str 
+		(nếu không có + 1 thì sẽ không thể lấy ký tự '\0' điều này gây ra việc in rác khi mà chuỗi ko có ký tự kết thúc chuỗi) 
+        - Dùng memmove là vì str và start có thể bị ghi chồng lên vùng nhớ của nhau và memmove đảm bảo copy đúng dữ liệu dù bị chồng lấp*/
+    }
+
+    // 3. Xoá khoảng trắng cuối
+    char *end = str + strlen(str) - 1;
+
+    while (end >= str && isspace((unsigned char)*end)) {
+        *end = '\0';
+        end--;
+    } 
 }
 
 void readLine(char *buffer, int maxLen) {
@@ -227,6 +254,18 @@ void readLine(char *buffer, int maxLen) {
      * 3. Nếu fgets trả về NULL, gán buffer[0] = '\0'
      * 4. Gọi strTrim để xoá khoảng trắng thừa
      */
+    
+	// 1. Đọc cả dòng từ stdin
+    if (fgets(buffer, maxLen, stdin) == NULL) {
+        buffer[0] = '\0'; // nếu lỗi → chuỗi rỗng
+        return;
+    }
+
+    // 2. Tìm ký tự '\n' và thay bằng '\0'
+    buffer[strcspn(buffer, "\n")] = '\0';
+
+    // 3. Xoá khoảng trắng đầu/cuối
+    strTrim(buffer);
 }
 
 void generateCustomerId(int n, char *buffer) {
@@ -615,6 +654,65 @@ int updateOrderStatus(void) {
      * 5. status++; updatedDate = time(NULL)
      * 6. saveOrders(); printSuccess(); return 1
      */
+    char orderId[ID_LEN];
+    
+    printf("Nhap ma phieu: ");
+    readLine(orderId, ID_LEN);
+
+    int idx = findOrderById(orderId);
+    if (idx == -1) {
+        printError("Khong tim thay phieu!");
+        return 0;
+    }
+
+    RepairOrder *o = &orders[idx];
+
+    // Nếu đã hoàn thành thì chặn
+    if (o->status == STATUS_DONE) {
+        printError("Phieu da hoan thanh, khong the cap nhat.");
+        return 0;
+    }
+
+    // Hiển thị trạng thái hiện tại
+    printf("Trang thai hien tai: ");
+    printStatus(o->status);
+    printf("\n");
+
+    // Hiển thị trạng thái tiếp theo
+    printf("Trang thai ke tiep: ");
+    printStatus(o->status + 1);
+    printf("\n");
+
+    // Xác nhận
+    int confirm;
+    do {
+        printf("Ban co chac chan cap nhat? [1: Yes | 0: No]: ");
+        scanf("%d", &confirm);
+        while (getchar() != '\n');
+
+        if (confirm != 0 && confirm != 1) {
+            printError("Nhap 0 hoac 1.");
+        }
+    } while (confirm != 0 && confirm != 1);
+
+    if (confirm == 0) {
+        printf("Da huy cap nhat.\n");
+        return 0;
+    }
+
+    // Update trạng thái
+    o->status++;
+    o->updatedDate = time(NULL);
+
+    // Lưu file
+    if (!saveOrders()) {
+        printError("Loi khi luu du lieu.");
+        return 0;
+    }
+
+    printSuccess("Cap nhat trang thai thanh cong.");
+    return 1;
+}
     return 0; /* placeholder */
 }
 
