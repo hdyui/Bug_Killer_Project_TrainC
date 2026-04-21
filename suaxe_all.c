@@ -116,7 +116,7 @@ int    strCmpIgnoreCase(const char *a, const char *b);
 void   strTrim(char *str);
 void   readLine(char *buffer, int maxLen);
 void   generateCustomerId(int n, char *buffer);
-void   generateOrderId(int i);
+void   generateOrderId();
 void   generateServiceId(int n, char *buffer);
 void   formatDateTime(time_t t, char *buffer);
 void   getTodayString(char *buffer);
@@ -233,8 +233,8 @@ void generateCustomerId(int n, char *buffer) {
     /* TODO: snprintf(buffer, ID_LEN, "CU%06d", n); */
 }
 
-void generateOrderId(int i) {
-    sprintf(orders[i].orderId,"RO%06d", ++orderCount);
+void generateOrderId() {
+    sprintf(orders[orderCount].orderId,"RO%06d", orderCount + 1);
 }
 
 void generateServiceId(int n, char *buffer) {
@@ -516,7 +516,7 @@ void createRepairOrder(void) {
         printf("So luong vuot muc toi da\n");
         return;
     }
-    int index;
+    int index; //vị trí khách hàng trong mảng 
     char phoneNumber[PHONE_LEN];
     int isConfirm;
     do{
@@ -545,39 +545,47 @@ void createRepairOrder(void) {
                 printf("Vui long nhap [1] hoac [0]\n");
         }
     }
-    while(isConfirm == 0 || isConfirm != 1 || findCustomerByPhone(phoneNumber) == -1);
-    generateOrderId(index);
-    strcpy(orders[index].customerPhone, customers[index].phoneNumber);
+    while(isConfirm != 1 || findCustomerByPhone(phoneNumber) == -1);
+    generateOrderId();
+    strcpy(orders[orderCount].customerPhone, customers[index].phoneNumber);
     char symptom[SYMPTOM_LEN];
     do{
         printf("Nhap tinh trang xe cua ban: ");
         scanf("%[^\n]", symptom);
     }
     while(strlen(symptom) == 0);
-    strcpy(orders[index].symptom, symptom);
-    orders[index].status = STATUS_RECEIVED;
-    orders[index].createdDate = time(NULL);
-    orders[index].itemCount = 0;
-    orders[index].totalAmount = 0;
+    strcpy(orders[orderCount].symptom, symptom);
+    orders[orderCount].status = STATUS_RECEIVED;
+    orders[orderCount].createdDate = time(NULL);
+    orders[orderCount].itemCount = 0;
+    orders[orderCount].totalAmount = 0;
+
+    printf("%-20s %-20s %-20s %-20s\n"
+        "ID", "Name", "Unit price", "Active");
     for(int i = 0; i < serviceCount; i++){
         int choice;
         if(services[i].isActive == 1){
+            
             do{
-                printf("%-20s %-20s %-20s %-20s\n"
-                "ID", "Name", "Unit price", "Active");
+                printf("%-20s %-20s %-20s %-20s\n",
+                services[i].serviceId, services[i].name, 
+                services[i].unitPrice, services[i].isActive);
+
                 printf("[1] Su dung dich vu nay\n");
                 printf("[0] Bo qua dich vu nay\n");
                 printf("Nhap lua chon: ");
                 scanf("%d", &choice);
             }
-            while(choice != 0 || choice != 1);
+            while(choice != 0 && choice != 1);
             if(choice == 1){
                 //hàm này chưa build
                 addItemToOrder(orderCount);
             }
         }
     }
-    
+    orderCount++;
+    customers[index].orderCount++;
+
 
     
 
