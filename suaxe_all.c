@@ -194,12 +194,39 @@ int isValidPhone(const char *phone) {
 }
 
 int isValidPlate(const char *plate) {
-    /* TODO:
-     * 1. Kiểm tra plate không NULL và không rỗng
-     * 2. Kiểm tra độ dài hợp lý (6-12 ký tự)
-     * 3. Trả về 1 nếu hợp lệ, 0 nếu không
-     */
-    return 0; /* placeholder */
+     int len;
+    int i;
+ 
+    /* Bước 1: kiểm tra không NULL và không rỗng */
+    if (plate == NULL) {
+        return 0;
+    }
+    if (plate[0] == '\0') {
+        return 0;
+    }
+    /* Bước 2: đếm độ dài và kiểm tra nằm trong [6, 12] */
+    len = 0;
+    while (plate[len] != '\0') {
+        len++;
+    }
+    if (len < 6 || len > 12) {
+        return 0;
+    }
+    /* Bước 3: duyệt từng ký tự, chỉ cho phép chữ cái, chữ số, '-', '.' */
+    for (i = 0; i < len; i++) {
+        int ch = plate[i];
+        int laChuSo   = (ch >= '0' && ch <= '9');
+        int laChuCai  = (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
+        int laGachNgang = (ch == '-');
+        int laChamHoi   = (ch == '.');
+ 
+        if (laChuSo == 0 && laChuCai == 0 && laGachNgang == 0 && laChamHoi == 0) {
+            return 0;   /* gặp ký tự không hợp lệ */
+        }
+    }
+ 
+    /* Qua hết các bước -> hợp lệ */
+    return 1;
 }
 
 int strCmpIgnoreCase(const char *a, const char *b) {
@@ -368,7 +395,7 @@ void initCustomers(void) {
 }
 
 int addCustomer(void) {
-    /* TODO:
+	/* TODO:
      * 1. Kiểm tra customerCount < MAX_CUSTOMERS
      * 2. Customer *c = &customers[customerCount];
      * 3. Nhập và validate fullName (không rỗng)
@@ -380,7 +407,78 @@ int addCustomer(void) {
      * 9. saveCustomers(); printSuccess("Da them khach hang.");
      * 10. return 1;
      */
-    return 0; /* placeholder */
+     
+    /* Biến tạm để nhập trước, sau khi hợp lệ mới gán vào mảng */
+    char tempName[NAME_LEN];
+    char tempPhone[PHONE_LEN];
+    char tempPlate[PLATE_LEN];
+    char tempType[CAR_TYPE_LEN];
+    int  foundIdx;
+ 
+    /* Kiểm tra hệ thống còn chỗ không */
+    if (customerCount >= MAX_CUSTOMERS) {
+        printError("He thong da day, khong the them khach hang moi.");
+        return 0;
+    }
+    /* --- Nhập họ tên --- */
+    /* Lặp cho đến khi người dùng nhập tên không rỗng */
+    do {
+        printf("  Ho va ten: ");
+        scanf(" %99[^\n]", tempName);   
+        while (getchar() != '\n');      
+        if (tempName[0] == '\0') {
+            printError("Ho ten khong duoc de trong.");
+        }
+    } while (tempName[0] == '\0');
+ 
+    /* --- Nhập số điện thoại --- */
+    while (1) {
+        printf("  So dien thoai: ");
+        scanf(" %14s", tempPhone);      
+        while (getchar() != '\n');
+        if (isValidPhone(tempPhone) == 0) {
+            printError("SDT khong hop le (chi chua so, 9-11 ky tu).");
+            continue;
+        }
+        foundIdx = findCustomerByPhone(tempPhone);
+        if (foundIdx != -1) {
+            printError("SDT nay da ton tai trong he thong.");
+            return 0; 
+        }
+        break; 
+    }
+    /* --- Nhập biển số xe --- */
+    while (1) {
+        printf("  Bien so xe (VD: 51F-123.45): ");
+        scanf(" %14s", tempPlate);
+        while (getchar() != '\n');
+        if (isValidPlate(tempPlate) == 0) {
+            printError("Bien so khong hop le.");
+            continue;
+        }
+        break;
+    }
+    /* --- Nhập loại xe --- */
+    do {
+        printf("  Loai xe (VD: Xe may, O to, Xe dap dien): ");
+        scanf(" %29[^\n]", tempType);
+        while (getchar() != '\n');
+        if (tempType[0] == '\0') {
+            printError("Loai xe khong duoc de trong.");
+        }
+    } while (tempType[0] == '\0');
+    /* --- Ghi dữ liệu vào ô mảng tại vị trí customerCount --- */
+    strcpy(customers[customerCount].fullName,    tempName);
+    strcpy(customers[customerCount].phoneNumber, tempPhone);
+    strcpy(customers[customerCount].carPlate,    tempPlate);
+    strcpy(customers[customerCount].carType,     tempType);
+    customers[customerCount].orderCount = 0;
+    generateCustomerId(customerCount + 1, customers[customerCount].customerId);
+    customerCount++;
+    saveCustomers();
+    printSuccess("Da them khach hang thanh cong!");
+    printf("  Ma KH duoc cap: %s\n", customers[customerCount - 1].customerId);
+    return 1;
 }
 
 int editCustomer(void) {
