@@ -157,8 +157,8 @@ void   listAllServices(void);
 
 /* repair */
 void   initOrders(void);
-void   createRepairOrder(void);
-int    addItemToOrder(int idx);
+int   createRepairOrder(void);
+int    addItemToOrder(int orderIdx, int serviceIdx);
 int    updateOrderStatus(void);
 int    findOrderById(const char *orderId);
 int    findOrdersByPhone(const char *phone, int *result, int maxResult);
@@ -219,6 +219,33 @@ void strTrim(char *str) {
      * 2. Dịch chuyển chuỗi về đầu nếu có khoảng trắng phía trước
      * 3. Tìm từ cuối về, cắt bỏ khoảng trắng cuối bằng cách đặt '\0'
      */
+     
+    if (str == NULL) return;
+
+    char *start = str;
+
+    // 1. Bỏ khoảng trắng đầu
+    while (*start && isspace((unsigned char)*start)) {
+        start++;
+    }
+
+    // 2. Dồn chuỗi về đầu (nếu có khoảng trắng đầu)
+    if (start != str) {
+        memmove(str, start, strlen(start) + 1);
+		/* 
+		- memmove là copy từ chỗ A sang chỗ B; và dù A và B có ghi đè lên nhau cũng không làm hỏng dữ liệu
+        - memmove sẽ sao chép toàn bộ nội dung chuỗi mà start trỏ tới (bao gồm cả ký tự '\0') vào vùng nhớ bắt đầu tại str 
+		(nếu không có + 1 thì sẽ không thể lấy ký tự '\0' điều này gây ra việc in rác khi mà chuỗi ko có ký tự kết thúc chuỗi) 
+        - Dùng memmove là vì str và start có thể bị ghi chồng lên vùng nhớ của nhau và memmove đảm bảo copy đúng dữ liệu dù bị chồng lấp*/
+    }
+
+    // 3. Xoá khoảng trắng cuối
+    char *end = str + strlen(str) - 1;
+
+    while (end >= str && isspace((unsigned char)*end)) {
+        *end = '\0';
+        end--;
+    } 
 }
 
 void readLine(char *buffer, int maxLen) {
@@ -228,6 +255,18 @@ void readLine(char *buffer, int maxLen) {
      * 3. Nếu fgets trả về NULL, gán buffer[0] = '\0'
      * 4. Gọi strTrim để xoá khoảng trắng thừa
      */
+    
+	// 1. Đọc cả dòng từ stdin
+    if (fgets(buffer, maxLen, stdin) == NULL) {
+        buffer[0] = '\0'; // nếu lỗi → chuỗi rỗng
+        return;
+    }
+
+    // 2. Tìm ký tự '\n' và thay bằng '\0'
+    buffer[strcspn(buffer, "\n")] = '\0';
+
+    // 3. Xoá khoảng trắng đầu/cuối
+    strTrim(buffer);
 }
 
 void generateCustomerId(int n, char *buffer) {
@@ -543,13 +582,14 @@ int editService(void) {
 }
 
 int findServiceById(const char *serviceId) {
-    /* TODO:
-     * for (int i = 0; i < serviceCount; i++)
-     *     if (strcmp(services[i].serviceId, serviceId) == 0 && services[i].isActive)
-     *         return i;
-     * return -1;
-     */
-    return -1; /* placeholder */
+    int index = -1;
+    for(int i = 0; i < serviceCount; i++){
+        if(strcmp(services[i].serviceId, serviceId) == 0 && services[i].isActive == 1){
+            index = i;
+            break;
+        }
+    }
+    return index;
 }
 
 void listAllServices(void) {
@@ -566,7 +606,7 @@ void listAllServices(void) {
 void initOrders(void) {
     /* TODO: orderCount = 0; memset(orders, 0, sizeof(orders)); */
 }
-void createRepairOrder(void) {
+int createRepairOrder(void) {
     /* TODO:
      * 1. Kiểm tra orderCount < MAX_REPAIR_ORDERS
      * 2. Nhập SĐT, findCustomerByPhone() -> nếu -1 báo lỗi return 0
@@ -584,13 +624,16 @@ void createRepairOrder(void) {
      * 7. orderCount++; customers[cIdx].orderCount++;
      * 8. saveOrders(); saveCustomers(); printSuccess(); return 1
      */
-    if(orderCount > MAX_REPAIR_ORDERS){
-        printf("So luong vuot muc toi da\n");
-        return;
-    }
+    int status = 1;
     int index; //vị trí khách hàng trong mảng 
     char phoneNumber[PHONE_LEN];
     int isConfirm;
+    if(orderCount >= MAX_REPAIR_ORDERS){
+        printf("So luong vuot muc toi da\n");
+        status = 0;
+        return status;
+    }
+   
     do{
         printf("Nhap so dien thoai khach hang: ");
         scanf("%[^\n]", phoneNumber);
@@ -637,7 +680,6 @@ void createRepairOrder(void) {
     for(int i = 0; i < serviceCount; i++){
         int choice;
         if(services[i].isActive == 1){
-            
             do{
                 printf("%-20s %-20s %-20s %-20s\n",
                 services[i].serviceId, services[i].name, 
@@ -651,7 +693,8 @@ void createRepairOrder(void) {
             while(choice != 0 && choice != 1);
             if(choice == 1){
                 //hàm này chưa build
-                addItemToOrder(orderCount);
+                addItemToOrder(orderCount, i);
+                
             }
         }
     }
@@ -661,21 +704,51 @@ void createRepairOrder(void) {
 
     
 
-     
+    printf("Tao phieu thanh cong\n");
+    return status;
 }
 
-int addItemToOrder(int idx) {
+int addItemToOrder(int orderIdx, int serviceIdx) {
     /* TODO:
-     * 1. Kiểm tra orders[idx].itemCount < MAX_ITEMS_PER_ORDER
-     * 2. Nhập serviceId; findServiceById() -> nếu -1 báo lỗi return 0
-     * 3. Nhập quantity (> 0)
-     * 4. Tạo RepairItem: sao chép serviceId, serviceName, unitPrice
-     *    subtotal = quantity * unitPrice
-     * 5. Gán vào orders[idx].items[itemCount++]
+    
+     * 5.   ms[itemCount++]
      * 6. orders[idx].totalAmount += subtotal
      * 7. return 1
      */
-    return 0; /* placeholder */
+    int status = 1; 
+    if(orders[orderIdx].itemCount >= MAX_ITEMS_PER_ORDER){
+        printf("So luong dich vu vuot muc toi da\n");
+        status = 0;
+        return status;
+    }   
+    int quantity;
+    do{
+        printf("Nhap so luong: ");
+        scanf("%d", &quantity);
+        while(getchar () != '\n');
+    }
+    while(quantity <= 0);
+    int itemIdx = orders[orderIdx].itemCount;
+
+    strcpy(orders[orderIdx].items[itemIdx].serviceId,
+                    services[serviceIdx].serviceId);
+
+    strcpy(orders[orderIdx].items[itemIdx].serviceName,
+            services[serviceIdx].name);
+
+    orders[orderIdx].items[itemIdx].unitPrice =
+           services[serviceIdx].unitPrice;
+
+    orders[orderIdx].items[itemIdx].quantity = quantity;
+
+    orders[orderIdx].items[itemIdx].subtotal = 
+            quantity * services[serviceIdx].unitPrice;
+    
+    orders[orderIdx].totalAmount += orders[orderIdx].items[itemIdx].subtotal;
+
+
+    orders[orderIdx].itemCount++;
+    return status;
 }
 
 int updateOrderStatus(void) {
@@ -687,6 +760,65 @@ int updateOrderStatus(void) {
      * 5. status++; updatedDate = time(NULL)
      * 6. saveOrders(); printSuccess(); return 1
      */
+    char orderId[ID_LEN];
+    
+    printf("Nhap ma phieu: ");
+    readLine(orderId, ID_LEN);
+
+    int idx = findOrderById(orderId);
+    if (idx == -1) {
+        printError("Khong tim thay phieu!");
+        return 0;
+    }
+
+    RepairOrder *o = &orders[idx];
+
+    // Nếu đã hoàn thành thì chặn
+    if (o->status == STATUS_DONE) {
+        printError("Phieu da hoan thanh, khong the cap nhat.");
+        return 0;
+    }
+
+    // Hiển thị trạng thái hiện tại
+    printf("Trang thai hien tai: ");
+    printStatus(o->status);
+    printf("\n");
+
+    // Hiển thị trạng thái tiếp theo
+    printf("Trang thai ke tiep: ");
+    printStatus(o->status + 1);
+    printf("\n");
+
+    // Xác nhận
+    int confirm;
+    do {
+        printf("Ban co chac chan cap nhat? [1: Yes | 0: No]: ");
+        scanf("%d", &confirm);
+        while (getchar() != '\n');
+
+        if (confirm != 0 && confirm != 1) {
+            printError("Nhap 0 hoac 1.");
+        }
+    } while (confirm != 0 && confirm != 1);
+
+    if (confirm == 0) {
+        printf("Da huy cap nhat.\n");
+        return 0;
+    }
+
+    // Update trạng thái
+    o->status++;
+    o->updatedDate = time(NULL);
+
+    // Lưu file
+    if (!saveOrders()) {
+        printError("Loi khi luu du lieu.");
+        return 0;
+    }
+
+    printSuccess("Cap nhat trang thai thanh cong.");
+    return 1;
+}
     return 0; /* placeholder */
 }
 
