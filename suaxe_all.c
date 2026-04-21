@@ -184,49 +184,23 @@ static void menuService(void);
  * ========================================================= */
 
 int isValidPhone(const char *phone) {
-    /* TODO:
-     * 1. Kiểm tra phone không NULL và không rỗng
-     * 2. Duyệt từng ký tự, đảm bảo tất cả là chữ số (isdigit)
-     * 3. Kiểm tra độ dài nằm trong khoảng [9, 11]
-     * 4. Trả về 1 nếu thoả tất cả, 0 nếu không
-     */
+     if ( phone != NULL && ( strlen(phone) <= 11 && strlen(phone) >= 9)){
+     	for ( int i = 0;  i < strlen(phone); i++){
+     		if ( !isdigit(phone[i])) return 0;
+		 }
+		 return 1;
+	 }
     return 0; /* placeholder */
 }
 
 int isValidPlate(const char *plate) {
-     int len;
-    int i;
- 
-    /* Bước 1: kiểm tra không NULL và không rỗng */
-    if (plate == NULL) {
-        return 0;
-    }
-    if (plate[0] == '\0') {
-        return 0;
-    }
-    /* Bước 2: đếm độ dài và kiểm tra nằm trong [6, 12] */
-    len = 0;
-    while (plate[len] != '\0') {
-        len++;
-    }
-    if (len < 6 || len > 12) {
-        return 0;
-    }
-    /* Bước 3: duyệt từng ký tự, chỉ cho phép chữ cái, chữ số, '-', '.' */
-    for (i = 0; i < len; i++) {
-        int ch = plate[i];
-        int laChuSo   = (ch >= '0' && ch <= '9');
-        int laChuCai  = (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
-        int laGachNgang = (ch == '-');
-        int laChamHoi   = (ch == '.');
- 
-        if (laChuSo == 0 && laChuCai == 0 && laGachNgang == 0 && laChamHoi == 0) {
-            return 0;   /* gặp ký tự không hợp lệ */
-        }
-    }
- 
-    /* Qua hết các bước -> hợp lệ */
-    return 1;
+    if ( plate != NULL && ( strlen(plate) >= 6 && strlen(plate) <= 11 )) {
+	    for (int i = 0; i < strlen(plate); i++) {
+	        if ( isdigit(plate[i]) || isalpha(plate[i]) || plate[i] == '-' || plate[i] == '.') {
+	            return 1;
+	        }
+	    }
+	}
 }
 
 int strCmpIgnoreCase(const char *a, const char *b) {
@@ -434,7 +408,7 @@ int addCustomer(void) {
     /* --- Nhập số điện thoại --- */
     while (1) {
         printf("  So dien thoai: ");
-        scanf(" %14s", tempPhone);      
+        scanf(" %10s", tempPhone);      
         while (getchar() != '\n');
         if (isValidPhone(tempPhone) == 0) {
             printError("SDT khong hop le (chi chua so, 9-11 ky tu).");
@@ -445,7 +419,7 @@ int addCustomer(void) {
             printError("SDT nay da ton tai trong he thong.");
             return 0; 
         }
-        break; 
+        break;
     }
     /* --- Nhập biển số xe --- */
     while (1) {
