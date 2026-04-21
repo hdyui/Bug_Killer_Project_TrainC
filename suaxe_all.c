@@ -157,8 +157,8 @@ void   listAllServices(void);
 
 /* repair */
 void   initOrders(void);
-void   createRepairOrder(void);
-int    addItemToOrder(int idx);
+int   createRepairOrder(void);
+int    addItemToOrder(int orderIdx, int serviceIdx);
 int    updateOrderStatus(void);
 int    findOrderById(const char *orderId);
 int    findOrdersByPhone(const char *phone, int *result, int maxResult);
@@ -471,13 +471,14 @@ int editService(void) {
 }
 
 int findServiceById(const char *serviceId) {
-    /* TODO:
-     * for (int i = 0; i < serviceCount; i++)
-     *     if (strcmp(services[i].serviceId, serviceId) == 0 && services[i].isActive)
-     *         return i;
-     * return -1;
-     */
-    return -1; /* placeholder */
+    int index = -1;
+    for(int i = 0; i < serviceCount; i++){
+        if(strcmp(services[i].serviceId, serviceId) == 0 && services[i].isActive == 1){
+            index = i;
+            break;
+        }
+    }
+    return index;
 }
 
 void listAllServices(void) {
@@ -494,7 +495,7 @@ void listAllServices(void) {
 void initOrders(void) {
     /* TODO: orderCount = 0; memset(orders, 0, sizeof(orders)); */
 }
-void createRepairOrder(void) {
+int createRepairOrder(void) {
     /* TODO:
      * 1. Kiểm tra orderCount < MAX_REPAIR_ORDERS
      * 2. Nhập SĐT, findCustomerByPhone() -> nếu -1 báo lỗi return 0
@@ -512,13 +513,16 @@ void createRepairOrder(void) {
      * 7. orderCount++; customers[cIdx].orderCount++;
      * 8. saveOrders(); saveCustomers(); printSuccess(); return 1
      */
-    if(orderCount > MAX_REPAIR_ORDERS){
-        printf("So luong vuot muc toi da\n");
-        return;
-    }
+    int status = 1;
     int index; //vị trí khách hàng trong mảng 
     char phoneNumber[PHONE_LEN];
     int isConfirm;
+    if(orderCount >= MAX_REPAIR_ORDERS){
+        printf("So luong vuot muc toi da\n");
+        status = 0;
+        return status;
+    }
+   
     do{
         printf("Nhap so dien thoai khach hang: ");
         scanf("%[^\n]", phoneNumber);
@@ -565,7 +569,6 @@ void createRepairOrder(void) {
     for(int i = 0; i < serviceCount; i++){
         int choice;
         if(services[i].isActive == 1){
-            
             do{
                 printf("%-20s %-20s %-20s %-20s\n",
                 services[i].serviceId, services[i].name, 
@@ -579,7 +582,8 @@ void createRepairOrder(void) {
             while(choice != 0 && choice != 1);
             if(choice == 1){
                 //hàm này chưa build
-                addItemToOrder(orderCount);
+                addItemToOrder(orderCount, i);
+                
             }
         }
     }
@@ -589,21 +593,51 @@ void createRepairOrder(void) {
 
     
 
-     
+    printf("Tao phieu thanh cong\n");
+    return status;
 }
 
-int addItemToOrder(int idx) {
+int addItemToOrder(int orderIdx, int serviceIdx) {
     /* TODO:
-     * 1. Kiểm tra orders[idx].itemCount < MAX_ITEMS_PER_ORDER
-     * 2. Nhập serviceId; findServiceById() -> nếu -1 báo lỗi return 0
-     * 3. Nhập quantity (> 0)
-     * 4. Tạo RepairItem: sao chép serviceId, serviceName, unitPrice
-     *    subtotal = quantity * unitPrice
-     * 5. Gán vào orders[idx].items[itemCount++]
+    
+     * 5.   ms[itemCount++]
      * 6. orders[idx].totalAmount += subtotal
      * 7. return 1
      */
-    return 0; /* placeholder */
+    int status = 1; 
+    if(orders[orderIdx].itemCount >= MAX_ITEMS_PER_ORDER){
+        printf("So luong dich vu vuot muc toi da\n");
+        status = 0;
+        return status;
+    }   
+    int quantity;
+    do{
+        printf("Nhap so luong: ");
+        scanf("%d", &quantity);
+        while(getchar () != '\n');
+    }
+    while(quantity <= 0);
+    int itemIdx = orders[orderIdx].itemCount;
+
+    strcpy(orders[orderIdx].items[itemIdx].serviceId,
+                    services[serviceIdx].serviceId);
+
+    strcpy(orders[orderIdx].items[itemIdx].serviceName,
+            services[serviceIdx].name);
+
+    orders[orderIdx].items[itemIdx].unitPrice =
+           services[serviceIdx].unitPrice;
+
+    orders[orderIdx].items[itemIdx].quantity = quantity;
+
+    orders[orderIdx].items[itemIdx].subtotal = 
+            quantity * services[serviceIdx].unitPrice;
+    
+    orders[orderIdx].totalAmount += orders[orderIdx].items[itemIdx].subtotal;
+
+
+    orders[orderIdx].itemCount++;
+    return status;
 }
 
 int updateOrderStatus(void) {
