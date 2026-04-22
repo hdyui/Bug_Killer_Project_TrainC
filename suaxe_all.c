@@ -648,10 +648,10 @@ int createRepairOrder(void) {
             printf("Khong ton tai so dien nay nay: %s\n", phoneNumber);
         }
         else{
-            printf("%-20s %-20s %-20s %-20s %-20s %-20d\n"
+            printf("%-20s %-20s %-20s %-20s %-20s %-20s\n",
             "ID", "Name", "Phone", "Car plate", "Car type", "Order count");
             index = findCustomerByPhone(phoneNumber);
-            printf("%-20s %-20s %-15s %-15s %-25s %-20d\n",
+            printf("%-20s %-20s %-20s %-20s %-20s %-20d\n",
                 customers[index].customerId, customers[index].fullName,
                 customers[index].phoneNumber, customers[index].carPlate,
                 customers[index].carType, customers[index].orderCount);
