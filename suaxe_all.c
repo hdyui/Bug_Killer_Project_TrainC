@@ -331,6 +331,10 @@ void getTodayString(char *buffer) {
 
 void printDivider(void) {
     /* TODO: In 60 ký tự '-' rồi xuống dòng */
+    for (int i = 0; i < 60; i++) {
+        printf("-");
+    }
+    printf("\n");
 }
 
 void printHeader(const char *title) {
@@ -378,6 +382,63 @@ void formatMoney(double amount, char *buffer) {
      * Chuyển amount thành chuỗi có dấu phân cách hàng nghìn + " VND"
      * VD: 1500000 -> "1,500,000 VND"
      */
+    long long num = (long long) amount; // Tiền Việt Nam không có phần lẻ nên tạo 1 biến num và ép kiểu amount lên long long để chứa số nguyên dài hơn
+
+    char temp[30]; // Chuỗi temp này để lưu số tiền ngược (cụ thể thì cứ xem ở dưới)
+    int i = 0, count = 0;
+
+    if (num == 0) {
+        strcpy(buffer, "0 VND");
+        return;
+    }
+
+    // build ngược
+    while (num > 0) {
+        if (count == 3) {
+            temp[i++] = ',';
+            count = 0;
+        }
+        temp[i++] = (num % 10) + '0';
+        /*
+        - temp[i++] gồm 2 việc: Đầu tiên là gán vào temp[i] sau đó mới tăng i = i + 1
+        - (num % 10) + '0' chia ra 2 phần nhỏ: "(num % 10)" là lấy ký tự cuối cùng của num và phần "+ '0'" là để chuyển số thành ký tự
+        - Giải thích hơn về việc chuyển số thành ký tự thì ta cần biết về ASCII:
+        	Ví dụ để hiểu rõ hơn: ta đang muốn chuyển số 5 thành ký tự '5':
+			+ Ký tự '0' có mã ASCII là 48
+			+ Ký tự '5' có mã ASCII là 53
+			=> Vậy 5 + '0' nghĩa là 5 + 48 = 53 (Cũng chính là ký tự '5')
+		- Vậy chung quy lại dòng này dùng để chuyển từng số của num thành các ký tự số và gán vào từng index của mảng temp và sau khi gán thì sẽ tăng 1 index
+        */
+        num /= 10;
+        count++;
+    }
+    temp[i] = '\0';
+    /*
+    - Vòng lặp này chạy khi num > 0 nghĩa là số tiền > 0
+    - Sau đó chuyển từng số của num thành các ký tự số và gán vào từng index của mảng temp và sau khi gán thì sẽ tăng 1 index
+    - Cập nhật lại số num
+    - Tăng biến count
+    - Nếu biến count = 3 nghĩa là đã đủ 3 ký tự số đã được đọc thì thêm dấu phẩy vào vị trí tiếp theo và reset biến count (Giải thích trong hàm if)
+    
+    - Việc lưu như thế này chúng ta có thể hình dung nó sẽ bị ngược so với số tiền thông thường, vậy nên ta phải tạo mảng temp để lưu giá trị ngược này
+    và sau đó phải đổi chiều lại
+    	Ví dụ để cho thấy điều đó (num = 1000):
+    	+ Vòng lặp đầu tiên: temp[0] = '0' -> num = 100 -> count = 1
+		+ Vòng lặp T2: temp[1] = '0' -> num = 10 -> count = 2 
+		+ Vòng lặp T3: temp[2] = '0' -> num = 1 -> count = 3
+		+ Vòng lặp T4: temp[3] = ',' -> num = 1 -> count = 0 -> temp[4] = '1' -> num = 0 -> count = 1
+		=> temp[5] = "000,1\0"
+    */
+
+    // đảo lại
+    int len = strlen(temp); // Lấy độ dài của chuỗi ký tự số của tiền
+    for (int j = 0; j < len; j++) {
+        buffer[j] = temp[len - j - 1]; // Lấy ký tự cuối của temp và ghi vào đầu buffer
+    }
+    buffer[len] = '\0'; // Kết thúc chuỗi bằng '\0'
+    
+
+    strcat(buffer, " VND"); // Dùng strcat để nối cụm " VND" vào sau số tiền từ buffer
 }
 
 /* =========================================================
@@ -585,6 +646,13 @@ void printCustomer(const Customer *c) {
      * printf("  Ho ten   : %s\n", c->fullName);
      * ... các trường còn lại
      */
+     
+    printf("  Ma KH    : %s\n", c->customerId);
+    printf("  Ho ten   : %s\n", c->fullName);
+    printf("  SDT      : %s\n", c->phoneNumber);
+    printf("  Bien so  : %s\n", c->carPlate);
+    printf("  Loai xe  : %s\n", c->carType);
+    printf("  So phieu : %d\n", c->orderCount);
 }
 
 void listAllCustomers(void) {
@@ -918,6 +986,63 @@ void printOrder(const RepairOrder *o) {
      * printf("  TONG TIEN  : %s\n", monBuf);
      * printDivider();
      */
+     
+    printDivider();
+
+    printf("  CHI TIET PHIEU SUA CHUA\n");
+    printDivider();
+
+    printf("  Ma phieu   : %s\n", o->orderId);
+    printf("  SDT KH     : %s\n", o->customerPhone);
+    printf("  Trieu chung: %s\n", o->symptom);
+
+    char dtBuf[20]; // dtBuf (Date time buffer): là cái mảng chứa chuỗi kết quả sau khi format thời gian 
+    formatDateTime(o->createdDate, dtBuf); // Lấy thời gian dạng số (time_t) → convert → ghi vào dtBuf
+    printf("  Ngay tao   : %s\n", dtBuf); // In ra thời gian
+
+    printf("  Trang thai : ");
+    printStatus(o->status);
+    printf("\n");
+
+    // thông tin khách
+    int cIdx = findCustomerByPhone(o->customerPhone);
+    // cIdx (Customer index): Vị trí của khách hàng trong mảng, giá trị của biến này được trả về khi gọi hàm findCustomerByPhone
+    if (cIdx != -1) {
+        printDivider();
+        printf("  THONG TIN KHACH HANG\n");
+        printCustomer(&customers[cIdx]);
+    }
+
+    printDivider();
+
+    // bảng dịch vụ
+    printf("  DANH SACH DICH VU\n");
+    printDivider();
+
+    printf("  %-4s %-25s %-5s %-15s %-15s\n", "STT", "Ten DV", "SL", "Don gia", "Thanh tien");
+    printDivider();
+
+    for (int i = 0; i < o->itemCount; i++) { // Vòng lặp này dùng để duyệt từng dịch vụ trong phiếu
+        char priceBuf[30], subBuf[30]; // priceBuf để lưu giá tiền 1 lần làm dịch vụ và subBuf để lưu tổng giá tiền của 1 dịch vụ
+
+        formatMoney(o->items[i].unitPrice, priceBuf);
+        formatMoney(o->items[i].subtotal, subBuf);
+
+        printf("  %-4d %-25s %-5d %-15s %-15s\n",
+               i + 1, // i + 1 là số thứ tự
+               o->items[i].serviceName, // Tên dịch vụ
+               o->items[i].quantity, // Số lượng lần làm cái dịch vụ đó
+               priceBuf, // Số tiền 1 lần làm dịch vụ đó
+               subBuf); // Tổng số tiền làm dịch vụ đó (Ví dụ như thay bánh xe thì thay 2 bánh thì tổng số tiền sẽ là 2 * số tiền thay 1 bánh
+    }
+
+    printDivider();
+
+    // tổng tiền
+    char totalBuf[30];
+    formatMoney(o->totalAmount, totalBuf);
+    printf("  TONG TIEN: %s\n", totalBuf);
+    printDivider();
 }
 
 void listOrders(int statusFilter) {
