@@ -819,8 +819,7 @@ int updateOrderStatus(void) {
     printSuccess("Cap nhat trang thai thanh cong.");
     return 1;
 }
-    return 0; /* placeholder */
-}
+
 
 int findOrderById(const char *orderId) {
     /* TODO:
