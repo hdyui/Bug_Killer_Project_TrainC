@@ -270,7 +270,7 @@ void readLine(char *buffer, int maxLen) {
 }
 
 void generateCustomerId(int n, char *buffer) {
-    /* TODO: snprintf(buffer, ID_LEN, "CU%06d", n); */
+    sprintf(buffer, "CU%06d", n);
 }
 
 void generateOrderId() {
