@@ -675,7 +675,7 @@ int createRepairOrder(void) {
     orders[orderCount].itemCount = 0;
     orders[orderCount].totalAmount = 0;
 
-    printf("%-20s %-20s %-20s %-20s\n"
+    printf("%-20s %-20s %-20s %-20s\n",
         "ID", "Name", "Unit price", "Active");
     for(int i = 0; i < serviceCount; i++){
         int choice;
