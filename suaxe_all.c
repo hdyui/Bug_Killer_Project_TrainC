@@ -287,6 +287,37 @@ void formatDateTime(time_t t, char *buffer) {
      * struct tm *tm_info = localtime(&t);
      * strftime(buffer, 20, "%d/%m/%Y %H:%M", tm_info);
      */
+    
+    /*
+	- Kiểu dữ liệu time_t là một dải số thời gian dạng máy tính, thì để con người có thể đọc được thì nó cần phải được chuyển đổi
+	- Thì logic xử lý ở đây sẽ phân tích dải số đó ra thành ngày giờ dễ dùng bằng localtime và truyền vào từng field cho struct tm
+    */
+    struct tm *tm_info = localtime(&t);
+    /* 
+	- struct tm là một struct chuẩn có sẵn khi include thư viện time.h
+	struct tm {
+    int tm_sec;   // giây
+    int tm_min;   // phút
+    int tm_hour;  // giờ
+    int tm_mday;  // ngày
+    int tm_mon;   // tháng (0-11)
+    int tm_year;  // năm - 1900
+	};
+
+	- localtime là hàm sẽ nhận vào time_t rồi trả về con trỏ tới struct tm nghĩa là nó sẽ lấy thời gian t, chuyển thành struct tm, 
+	rồi lưu địa chỉ vào tm_info. Dữ liệu truyền vào cho hàm localtime là con trỏ bởi vì struct tm khá lớn, tránh việc copy dữ liệu để tối
+	ưu hiệu năng
+	*/
+    strftime(buffer, 20, "%d/%m/%Y %H:%M", tm_info);
+    /*
+    - Nhiệm vụ của dòng này là format struct tm thành một chuỗi theo format mà mình muốn
+    - Tham số của hàm là buffer (nơi chứa cái kết quả), 20 là số ký tự tối đa (tính cả '\0') và cái đống trong ngoặc kép là format mình
+    muốn, còn tm_info là mình muốn nó in ra dữ liệu từ tm_info (Ở đây việc chỉ ra từng field trong struct mà tm_info đang trỏ đến là ko cần
+    thiết là vì hàm strftime đã xử lý hết cho chúng ta rồi, nó sẽ tự nhìn vào data specifier để tự lấy dữ liệu và format theo cái mà mình
+    muốn)
+    
+    */
+}
 }
 
 
@@ -326,6 +357,20 @@ void printStatus(int status) {
      *   2 -> COLOR_GREEN  "Hoan thanh"
      * Sau đó COLOR_RESET
      */
+     
+    switch (status) {
+        case STATUS_RECEIVED:
+            printf(COLOR_GRAY "Tiep nhan" COLOR_RESET);
+            break;
+        case STATUS_REPAIRING:
+            printf(COLOR_YELLOW "Dang sua" COLOR_RESET);
+            break;
+        case STATUS_DONE:
+            printf(COLOR_GREEN "Hoan thanh" COLOR_RESET);
+            break;
+        default:
+            printf(COLOR_RED "Khong xac dinh" COLOR_RESET);
+    }
 }
 
 void formatMoney(double amount, char *buffer) {
@@ -827,6 +872,12 @@ int findOrderById(const char *orderId) {
      *     if (strcmp(orders[i].orderId, orderId) == 0) return i;
      * return -1;
      */
+    
+	for (int i = 0; i < orderCount; i++) {
+        if (strcmp(orders[i].orderId, orderId) == 0) {
+            return i;
+        }
+    }
     return -1; /* placeholder */
 }
 
