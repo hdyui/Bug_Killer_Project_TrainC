@@ -1104,7 +1104,9 @@ int findOrdersByPhone(const char *phone, int *result, int maxResult) {
     int count = 0;
 
     for (int i = 0; i < orderCount; i++) {
-        if (count >= maxResult) break; 
+        if (count >= maxResult){
+            break; 
+        }
 
         if (strcmp(orders[i].customerPhone, phone) == 0) {
             result[count] = i; 
