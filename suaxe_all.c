@@ -1220,10 +1220,48 @@ void viewCustomerHistory(void) {
 }
 
 void searchOrderMenu(void) {
-    /* TODO:
-     * [1] Tìm theo mã phiếu -> findOrderById -> printOrder
-     * [2] Tìm theo biển số  -> findOrdersByPlate -> printOrder từng phiếu
-     */
+    
+    int choice;
+    do{
+        printf("Lua chon tim kiem:\n");
+        printf("[1] Tim theo ma phieu\n");
+        printf("[2] Tim theo bien so xe\n");
+        printf("Nhap lua chon: ");
+        scanf("%d", &choice);
+        while (getchar() != '\n');
+        if(choice != 1 && choice != 2){
+            printf("Vui long nhap [1] hoac [2]\n");
+        }
+        
+    }
+    while(choice != 1 && choice != 2);
+    if(choice == 1){
+        char OrderId[ID_LEN];
+        printf("Nhap ma phieu: ");
+        scanf("%[^\n]", OrderId);
+        int idx = findOrderById(OrderId); 
+        if(idx = -1){
+            printf("Khong tim thay phieu\n");
+        }
+        else{
+            printOrder(&orders[idx]);
+        }
+    }
+    else if(choice == 2){
+        char plate[PLATE_LEN];
+        printf("Nhap bien so xe: ");
+        scanf("%[^\n]", plate);
+        int idxArr[MAX_REPAIR_ORDERS];
+        int n = findOrdersByPlate(plate, idxArr, MAX_REPAIR_ORDERS);
+        if(n == 0){
+            printf("Khong tim thay phieu nao voi bien so xe nay\n");
+        }
+        else{
+            for(int i = 0; i < n; i++){
+                printOrder(&orders[idxArr[i]]);
+            }
+        }
+    }
 }
 
 /* =========================================================
