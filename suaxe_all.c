@@ -318,7 +318,7 @@ void formatDateTime(time_t t, char *buffer) {
     
     */
 }
-}
+
 
 
 void getTodayString(char *buffer) {
