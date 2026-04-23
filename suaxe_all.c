@@ -1226,6 +1226,7 @@ void searchOrderMenu(void) {
         printf("Lua chon tim kiem:\n");
         printf("[1] Tim theo ma phieu\n");
         printf("[2] Tim theo bien so xe\n");
+        printDivider();
         printf("Nhap lua chon: ");
         scanf("%d", &choice);
         while (getchar() != '\n');
