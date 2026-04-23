@@ -1112,12 +1112,13 @@ int findOrdersByPhone(const char *phone, int *result, int maxResult) {
 }
 
 int findOrdersByPlate(const char *plate, int *result, int maxResult) {
-    /* TODO:
-     * int cIdx = findCustomerByPlate(plate);
-     * if (cIdx == -1) return 0;
-     * return findOrdersByPhone(customers[cIdx].phoneNumber, result, maxResult);
-     */
-    return 0; /* placeholder */
+    
+    int cIdx = findCustomerByPlate(plate);
+    if(cIdx == -1) {
+        return 0;
+    }
+
+    return findOrdersByPhone(customers[cIdx].phoneNumber, result, maxResult); /* placeholder */
 }
 
 void printOrder(const RepairOrder *o) {
