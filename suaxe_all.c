@@ -1101,16 +1101,18 @@ int findOrderById(const char *orderId) {
 }
 
 int findOrdersByPhone(const char *phone, int *result, int maxResult) {
-    int index = -1;
-    for(int i = 0; i < orderCount; i++){
-        if(strcmp(orders[i].customerPhone, phone) == 0){
-            index = i;
-            break;
+    int count = 0;
+
+    for (int i = 0; i < orderCount; i++) {
+        if (count >= maxResult) break; 
+
+        if (strcmp(orders[i].customerPhone, phone) == 0) {
+            result[count] = i; 
+            count++;          
         }
     }
-    return index; 
+    return count; 
 }
-
 int findOrdersByPlate(const char *plate, int *result, int maxResult) {
     
     int cIdx = findCustomerByPlate(plate);
