@@ -161,7 +161,7 @@ int   createRepairOrder(void);
 int    addItemToOrder(int orderIdx, int serviceIdx);
 int    updateOrderStatus(void);
 int    findOrderById(const char *orderId);
-int    findOrdersByPhone(const char *phone, int *result, int maxResult);
+int    findOrdersByPhone(const char *phone);
 int    findOrdersByPlate(const char *plate, int *result, int maxResult);
 void   printOrder(const RepairOrder *o);
 void   listOrders(int statusFilter);
@@ -1100,15 +1100,14 @@ int findOrderById(const char *orderId) {
     return -1; /* placeholder */
 }
 
-int findOrdersByPhone(const char *phone, int *result, int maxResult) {
-    int index = -1;
+int findOrdersByPhone(const char *phone) {
+    int count = 0;
     for(int i = 0; i < orderCount; i++){
         if(strcmp(orders[i].customerPhone, phone) == 0){
-            index = i;
-            break;
+            count++;
         }
     }
-    return index; 
+    return count; 
 }
 
 int findOrdersByPlate(const char *plate, int *result, int maxResult) {
