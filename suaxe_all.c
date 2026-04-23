@@ -831,6 +831,52 @@ int addService(void) {
      * 5. Gán isActive = 1; serviceCount++;
      * 6. saveServices(); printSuccess(); return 1;
      */
+    /* 1. Kiểm tra giới hạn mảng */
+    if (serviceCount >= MAX_SERVICES) {
+        printError("He thong da day, khong the them dich vu moi.");
+        return 0;
+    }
+
+    char tempName[SERVICE_NAME_LEN];
+    double tempPrice;
+
+    /* 2. Nhập tên dịch vụ (không rỗng) */
+    do {
+        printf("  Ten dich vu: ");
+        readLine(tempName, SERVICE_NAME_LEN);
+        if (tempName[0] == '\0') {
+            printError("Ten dich vu khong duoc de trong.");
+        }
+    } while (tempName[0] == '\0');
+
+    /* 3. Nhập đơn giá (phải > 0) */
+    do {
+        printf("  Don gia (VND): ");
+        if (scanf("%lf", &tempPrice) != 1) {
+            while (getchar() != '\n'); /* Xóa buffer nếu nhập sai kiểu (chữ) */
+            printError("Don gia phai la mot so.");
+            tempPrice = -1;
+        } else {
+            while (getchar() != '\n'); /* Xóa buffer sau khi lấy số */
+            if (tempPrice <= 0) {
+                printError("Don gia phai lon hon 0.");
+            }
+        }
+    } while (tempPrice <= 0);
+
+    /* 4. Khởi tạo mã DV và đưa vào mảng */
+    strcpy(services[serviceCount].name, tempName);
+    services[serviceCount].unitPrice = tempPrice;
+    services[serviceCount].isActive = 1;
+    sprintf(services[serviceCount].serviceId, "SV%06d", serviceCount + 1);
+
+    /* 5. Tăng biến đếm và lưu file */
+    serviceCount++;
+    saveServices();
+    
+    printSuccess("Da them dich vu thanh cong!");
+    printf("  Ma DV duoc cap: %s\n", services[serviceCount - 1].serviceId);
+        
     return 0; /* placeholder */
 }
 
