@@ -1244,14 +1244,21 @@ void listOrders(int statusFilter) {
 }
 
 void viewCustomerHistory(void) {
-    /* TODO:
-     * 1. Nhập SĐT; findCustomerByPhone() -> nếu -1 báo lỗi return
-     * 2. printCustomer
-     * 3. int indices[MAX_REPAIR_ORDERS];
-     *    int n = findOrdersByPhone(phone, indices, MAX_REPAIR_ORDERS);
-     * 4. if (n == 0) puts("Chua co lich su sua chua.");
-     * 5. else for (int i = 0; i < n; i++) printOrder(&orders[indices[i]]);
-     */
+   
+    char phone[PHONE_LEN];
+    printf("Nhap so dien thoai khach hang: ");
+    scanf("%[^\n]", phone);
+    int index_array[MAX_REPAIR_ORDERS];
+    int n = findOrdersByPhone(phone, index_array, MAX_REPAIR_ORDERS);
+    if (n == 0) {
+        printf("Khach hang chua co lich su sua chua.\n");
+    }
+    else{
+        for(int i = 0; i < n; i++){
+            printOrder(&orders[index_array[i]]);
+        }
+    }
+    
 }
 
 void searchOrderMenu(void) {
