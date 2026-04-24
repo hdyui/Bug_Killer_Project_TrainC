@@ -306,6 +306,15 @@ void generateOrderId() {
 void generateServiceId(int n, char *buffer) {
     /* TODO: snprintf(buffer, ID_LEN, "SV%06d", n); */
     
+    // Hàm này để tạo ID dịch vụ theo format cố định
+	snprintf(buffer, ID_LEN, "SV%06d", n);
+	/*
+	- snprintf dùng để ghi chuỗi vào buffer với độ dài được define sẵn 
+	- buffer là nơi chứa kết quả 
+	- Phần trong ngoặc kép là format của chuỗi ID
+	- Còn n là số đếm để tạo ID
+	*/
+
 }
 
 void formatDateTime(time_t t, char *buffer) {
