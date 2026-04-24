@@ -41,7 +41,7 @@
 /* --- Đường dẫn file --- */
 #define FILE_CUSTOMERS "none.txt"
 #define FILE_ORDERS    "chuaco.txt"
-#define FILE_SERVICES  "services.txt"
+#define FILE_SERVICES  "services.bin"
 
 /* --- Màu ANSI --- */
 #define COLOR_RESET  "\033[0m"
@@ -615,7 +615,26 @@ int saveServices(void) {
 
 int loadServices(void) {
     /* TODO: Tương tự loadCustomers cho services[] / FILE_SERVICES */
-    return 0; /* placeholder */
+   
+   FILE *fp = fopen(FILE_SERVICES, "rb"); 
+    // Mở file services.dat ở chế độ đọc nhị phân
+
+    if (!fp) {
+        printError("Khong mo duoc file!"); // Không mở được file thì có thể là lần đầu chạy chưa có file
+        return 0; 
+    }
+
+    fread(&serviceCount, sizeof(int), 1, fp); 
+    // Đọc số lượng dịch vụ đã lưu trước đó
+
+    fread(services, sizeof(Service), serviceCount, fp); 
+    // Đọc toàn bộ mảng services từ file vào RAM
+
+    fclose(fp); 
+    // Đóng file
+
+    return 1; 
+    // Load thành công
 }
 
 void loadAllData(void) {
@@ -1733,7 +1752,6 @@ int main(void) {
     initCustomers();
     initServices();
 
-    ensureDataDir();
     loadAllData();
 
     do {
