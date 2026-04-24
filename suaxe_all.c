@@ -210,7 +210,33 @@ int strCmpIgnoreCase(const char *a, const char *b) {
      * 3. Nếu khác nhau, trả về hiệu của hai ký tự đó
      * 4. Nếu đến cuối cả hai, trả về 0
      */
-    return 0; /* placeholder */
+    
+    // Hàm này để so sánh 2 chuỗi nhưng không phân biệt chữ hoa hay chữ thường
+    
+    int i = 0;
+
+    while (a[i] != '\0' && b[i] != '\0') { 
+	// Mình đang muốn so sánh 2 chuỗi với nhau nên nếu 1 trong 2 kết thúc thì việc biến chữ hoa thành chữ thường ở những ký tự sau là không cần thiết
+        char ca = tolower((unsigned char)a[i]);
+        char cb = tolower((unsigned char)b[i]);
+        /*
+        - Hai biến ca và cb này mục tiêu là để biến chữ in hoa thành chữ thường và ở đây ta ép kiểu unsigned char là để tránh lỗi khi char âm thì đây
+        việc ép kiểu là cách viết an toàn
+        */
+
+        if (ca != cb) {
+            return ca - cb;  // khác nhau → trả về độ lệch
+        }
+        /*
+        - Mục đích của bước này là để cho biết 2 chuỗi này khác nhau ở đâu và chuỗi đc so sánh theo thứ tự từ trái sang phải thì nếu khác nhau ở ký tự
+        đầu tiên luôn thì output luôn kết quả, nếu ko có bước này thì nó sẽ duyệt hết chuỗi luôn 
+        */
+
+        i++;
+    }
+
+    // nếu 1 trong 2 chuỗi kết thúc trước
+    return tolower((unsigned char)a[i]) - tolower((unsigned char)b[i]); // Nếu cả 2 chuỗi có độ dài bằng nhau thì lúc này nó sẽ tương đương return 0
 }
 
 void strTrim(char *str) {
