@@ -516,14 +516,6 @@ void formatMoney(double amount, char *buffer) {
  * SECTION 6: FILE I/O
  * ========================================================= */
 
-void ensureDataDir(void) {
-    /* TODO:
-     * mkdir("data", 0755) trên Linux/Mac
-     * hoặc _mkdir("data") trên Windows
-     * Bỏ qua lỗi nếu thư mục đã tồn tại
-     */
-}
-
 int saveCustomers(void) {
     /* TODO:
      * FILE *fp = fopen(FILE_CUSTOMERS, "wb");
@@ -533,7 +525,34 @@ int saveCustomers(void) {
      * fclose(fp);
      * return 1;
      */
-    return 0; /* placeholder */
+    
+    FILE *fp = fopen(FILE_CUSTOMERS, "wb"); 
+    /*
+	Mở file ở chế độ ghi nhị phân (chọn ghi nhị phân là vì mình dùng fwrite và nhóm dùng fwrite vì nó tối ưu hơn về tốc độ, ít lỗi hơn khi làm việc 
+	với struct)
+    Nếu file chưa tồn tại thì sẽ tạo mới
+    Nếu đã tồn tại thì sẽ ghi đè
+	*/ 
+
+    if (!fp) { 
+        printError("Khong the ghi file khach hang."); 
+        return 0; 
+        // Nếu mở file thất bại (vd: không có thư mục data) thù sẽ báo lỗi và return 0 (fail)
+    }
+
+    fwrite(&customerCount, sizeof(int), 1, fp); 
+    // Ghi số lượng khách hàng vào file trước để lúc load biết cần đọc bao nhiêu phần tử
+
+    fwrite(customers, sizeof(Customer), customerCount, fp); 
+    // Ghi toàn bộ mảng customers vào file
+    // mỗi phần tử có kích thước sizeof(Customer)
+    // tổng cộng customerCount phần tử
+
+    fclose(fp); 
+    // Đóng file lại 
+
+    return 1; 
+    // Trả về 1 = lưu thành công
 }
 
 int loadCustomers(void) {
@@ -550,7 +569,28 @@ int loadCustomers(void) {
 
 int saveOrders(void) {
     /* TODO: Tương tự saveCustomers cho orders[] / FILE_ORDERS */
-    return 0; /* placeholder */
+    
+	FILE *fp = fopen(FILE_ORDERS, "wb"); 
+    // Mở file orders.dat ở chế độ ghi nhị phân (giải thích tương tự hàm saveCustomers)
+    // Nếu chưa có thì tạo mới, nếu có rồi thì ghi đè lên
+
+    if (!fp) {
+        printError("Khong the ghi file phieu sua."); 
+        return 0; 
+        // Nếu mở file thất bại thì báo lỗi và return 0
+    }
+
+    fwrite(&orderCount, sizeof(int), 1, fp); 
+    // Ghi số lượng phiếu sửa (orderCount) vào đầu file để lúc load biết cần đọc bao nhiêu phần tử
+
+    fwrite(orders, sizeof(RepairOrder), orderCount, fp); 
+    // Ghi toàn bộ mảng orders xuống file, mỗi phần tử có kích thước sizeof(RepairOrder)
+
+    fclose(fp); 
+    // Đóng file 
+
+    return 1; 
+    // Lưu thành công
 }
 
 int loadOrders(void) {
@@ -560,7 +600,27 @@ int loadOrders(void) {
 
 int saveServices(void) {
     /* TODO: Tương tự saveCustomers cho services[] / FILE_SERVICES */
-    return 0; /* placeholder */
+    
+	FILE *fp = fopen(FILE_SERVICES, "wb"); 
+    // Mở file services.dat ở chế độ ghi nhị phân
+
+    if (!fp) {
+        printError("Khong the ghi file dich vu."); 
+        return 0; 
+        // Nếu mở file fail thì sẽ báo lỗi
+    }
+
+    fwrite(&serviceCount, sizeof(int), 1, fp); 
+    // Ghi số lượng dịch vụ
+
+    fwrite(services, sizeof(Service), serviceCount, fp); 
+    // Ghi toàn bộ mảng services
+
+    fclose(fp); 
+    // Đóng file
+
+    return 1; 
+    // Thành công
 }
 
 int loadServices(void) {
@@ -574,6 +634,15 @@ void loadAllData(void) {
 
 void saveAllData(void) {
     /* TODO: Gọi saveCustomers(), saveServices(), saveOrders() */
+    
+	saveCustomers(); 
+    // Lưu khách hàng
+
+    saveServices();  
+    // Lưu dịch vụ
+
+    saveOrders();    
+    // Lưu phiếu sửa
 }
 
 /* =========================================================
