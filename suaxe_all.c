@@ -363,6 +363,30 @@ void getTodayString(char *buffer) {
      * struct tm *tm_info = localtime(&now);
      * strftime(buffer, 12, "%d/%m/%Y", tm_info);
      */
+    time_t now = time(NULL);                 // lấy thời gian hiện tại
+    struct tm *tm_info = localtime(&now);    // chuyển sang dạng ngày giờ dễ đọc
+    strftime(buffer, 12, "%d/%m/%Y", tm_info); // format thành chuỗi
+    /*
+    - Dòng đầu của hàm này dùng để lấy thời gian hiện tại
+    - Hai dòng còn lại thì có ý nghĩa như đã giải thích trên hàm formatDateTime
+    */
+}
+char * getStatusString(int status){
+    char * message;
+    switch(status){
+        case STATUS_RECEIVED:
+            message = "Tiep nhan";
+            break;
+        case STATUS_REPAIRING:
+            message =  "Dang sua";
+            break;
+        case STATUS_DONE:
+            message = "Hoan thanh";
+            break;
+        default:
+            message = "Khong xac dinh";
+    }
+    return message;
 }
 char * getStatusString(int status){
     char * message;
@@ -395,14 +419,25 @@ void printHeader(const char *title) {
      * printf(COLOR_BOLD COLOR_CYAN "  %s\n" COLOR_RESET, title);
      * printDivider();
      */
+    
+	printDivider();  // dòng kẻ trên
+
+    printf(COLOR_BOLD COLOR_CYAN "  %s\n" COLOR_RESET, title);
+    // in tiêu đề với màu + in đậm
+
+    printDivider();  // dòng kẻ dưới
 }
 
 void printSuccess(const char *msg) {
     /* TODO: printf(COLOR_GREEN "[OK] %s\n" COLOR_RESET, msg); */
+    
+    printf(COLOR_GREEN "[OK] %s\n" COLOR_RESET, msg);
 }
 
 void printError(const char *msg) {
     /* TODO: printf(COLOR_RED "[LOI] %s\n" COLOR_RESET, msg); */
+    
+    printf(COLOR_RED "[LOI] %s\n" COLOR_RESET, msg);
 }
 
 void printStatus(int status) {
