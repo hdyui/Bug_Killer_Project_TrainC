@@ -115,9 +115,9 @@ int    isValidPlate(const char *plate);
 int    strCmpIgnoreCase(const char *a, const char *b);
 void   strTrim(char *str);
 void   readLine(char *buffer, int maxLen);
-void   generateCustomerId(int n, char *buffer);
+void   generateCustomerId();
 void   generateOrderId();
-void   generateServiceId(int n, char *buffer);
+void   generateServiceId();
 void   formatDateTime(time_t t, char *buffer);
 void   getTodayString(char *buffer);
 char * getStatusString(int status);
@@ -296,26 +296,16 @@ void readLine(char *buffer, int maxLen) {
     strTrim(buffer);
 }
 
-void generateCustomerId(int n, char *buffer) {
-    sprintf(buffer, "CU%06d", n);
+void generateCustomerId() {
+    sprintf(customers[customerCount].customerId, "CU%06d", customerCount+1);
 }
 
 void generateOrderId() {
     sprintf(orders[orderCount].orderId,"RO%06d", orderCount + 1);
 }
 
-void generateServiceId(int n, char *buffer) {
-    /* TODO: snprintf(buffer, ID_LEN, "SV%06d", n); */
-    
-    // Hàm này để tạo ID dịch vụ theo format cố định
-	snprintf(buffer, ID_LEN, "SV%06d", n);
-	/*
-	- snprintf dùng để ghi chuỗi vào buffer với độ dài được define sẵn 
-	- buffer là nơi chứa kết quả 
-	- Phần trong ngoặc kép là format của chuỗi ID
-	- Còn n là số đếm để tạo ID
-	*/
-
+void generateServiceId() {
+    sprintf(services[serviceCount].serviceId, "SV%06d", serviceCount + 1);
 }
 
 void formatDateTime(time_t t, char *buffer) {
@@ -733,9 +723,8 @@ int addCustomer(void) {
     strcpy(customers[customerCount].carPlate,    tempPlate);
     strcpy(customers[customerCount].carType,     tempType);
     customers[customerCount].orderCount = 0;
-    generateCustomerId(customerCount + 1, customers[customerCount].customerId);
+    generateCustomerId();
     customerCount++;
-    printf("CSC %d", customerCount);
     saveCustomers();
     printSuccess("Da them khach hang thanh cong!");
     printf("  Ma KH duoc cap: %s\n", customers[customerCount - 1].customerId);
