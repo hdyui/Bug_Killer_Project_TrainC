@@ -120,6 +120,7 @@ void   generateOrderId();
 void   generateServiceId(int n, char *buffer);
 void   formatDateTime(time_t t, char *buffer);
 void   getTodayString(char *buffer);
+char * getStatusString(int status);
 void   printDivider(void);
 void   printHeader(const char *title);
 void   printSuccess(const char *msg);
@@ -363,7 +364,23 @@ void getTodayString(char *buffer) {
      * strftime(buffer, 12, "%d/%m/%Y", tm_info);
      */
 }
-
+char * getStatusString(int status){
+    char * message;
+    switch(status){
+        case STATUS_RECEIVED:
+            message = "Tiep nhan";
+            break;
+        case STATUS_REPAIRING:
+            message =  "Dang sua";
+            break;
+        case STATUS_DONE:
+            message = "Hoan thanh";
+            break;
+        default:
+            message = "Khong xac dinh";
+    }
+    return message;
+}
 void printDivider(void) {
     /* TODO: In 60 ký tự '-' rồi xuống dòng */
     for (int i = 0; i < 60; i++) {
@@ -991,7 +1008,6 @@ int createRepairOrder(void) {
             }
             while(choice != 0 && choice != 1);
             if(choice == 1){
-                //hàm này chưa build
                 addItemToOrder(orderCount, i);
                 
             }
@@ -1121,12 +1137,7 @@ int updateOrderStatus(void) {
 
 
 int findOrderById(const char *orderId) {
-    /* TODO:
-     * for (int i = 0; i < orderCount; i++)
-     *     if (strcmp(orders[i].orderId, orderId) == 0) return i;
-     * return -1;
-     */
-    
+   
 	for (int i = 0; i < orderCount; i++) {
         if (strcmp(orders[i].orderId, orderId) == 0) {
             return i;
@@ -1237,10 +1248,21 @@ void printOrder(const RepairOrder *o) {
 }
 
 void listOrders(int statusFilter) {
-    /* TODO:
-     * In header: STT | Mã phiếu | SĐT KH | Ngày tạo | Trạng thái | Tổng tiền
-     * Duyệt for; nếu statusFilter == -1 hoặc == orders[i].status thì in
-     */
+    printDivider();
+    printf("  %-4s %-10s %-15s %-20s %-15s %s\n",
+           "STT", "Ma phieu", "SDT KH", "Ngay tao", "Trang thai", "Tong tien");
+    printDivider();
+    for(int i = 0; i < orderCount; i ++){
+        if(statusFilter == -1 || statusFilter == orders[i].status){
+            char dateFormatted[20];
+            char moneyFormatted[30];
+            formatDateTime(orders[i].createdDate, dateFormatted);
+            formatMoney(orders[i].totalAmount, moneyFormatted);
+            printf("  %-4d %-10s %-15s %-20s %-15s %s\n",
+                   i + 1, orders[i].orderId, orders[i].customerPhone,
+                   dateFormatted, getStatusString(orders[i].status), moneyFormatted);
+        }
+    }
 }
 
 void viewCustomerHistory(void) {
