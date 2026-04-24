@@ -120,6 +120,7 @@ void   generateOrderId();
 void   generateServiceId(int n, char *buffer);
 void   formatDateTime(time_t t, char *buffer);
 void   getTodayString(char *buffer);
+char * getStatusString(int status);
 void   printDivider(void);
 void   printHeader(const char *title);
 void   printSuccess(const char *msg);
@@ -362,8 +363,31 @@ void getTodayString(char *buffer) {
      * struct tm *tm_info = localtime(&now);
      * strftime(buffer, 12, "%d/%m/%Y", tm_info);
      */
+    time_t now = time(NULL);                 // lấy thời gian hiện tại
+    struct tm *tm_info = localtime(&now);    // chuyển sang dạng ngày giờ dễ đọc
+    strftime(buffer, 12, "%d/%m/%Y", tm_info); // format thành chuỗi
+    /*
+    - Dòng đầu của hàm này dùng để lấy thời gian hiện tại
+    - Hai dòng còn lại thì có ý nghĩa như đã giải thích trên hàm formatDateTime
+    */
 }
-
+char * getStatusString(int status){
+    char * message;
+    switch(status){
+        case STATUS_RECEIVED:
+            message = "Tiep nhan";
+            break;
+        case STATUS_REPAIRING:
+            message =  "Dang sua";
+            break;
+        case STATUS_DONE:
+            message = "Hoan thanh";
+            break;
+        default:
+            message = "Khong xac dinh";
+    }
+    return message;
+}
 void printDivider(void) {
     /* TODO: In 60 ký tự '-' rồi xuống dòng */
     for (int i = 0; i < 60; i++) {
@@ -378,14 +402,25 @@ void printHeader(const char *title) {
      * printf(COLOR_BOLD COLOR_CYAN "  %s\n" COLOR_RESET, title);
      * printDivider();
      */
+    
+	printDivider();  // dòng kẻ trên
+
+    printf(COLOR_BOLD COLOR_CYAN "  %s\n" COLOR_RESET, title);
+    // in tiêu đề với màu + in đậm
+
+    printDivider();  // dòng kẻ dưới
 }
 
 void printSuccess(const char *msg) {
     /* TODO: printf(COLOR_GREEN "[OK] %s\n" COLOR_RESET, msg); */
+    
+    printf(COLOR_GREEN "[OK] %s\n" COLOR_RESET, msg);
 }
 
 void printError(const char *msg) {
     /* TODO: printf(COLOR_RED "[LOI] %s\n" COLOR_RESET, msg); */
+    
+    printf(COLOR_RED "[LOI] %s\n" COLOR_RESET, msg);
 }
 
 void printStatus(int status) {
@@ -991,7 +1026,6 @@ int createRepairOrder(void) {
             }
             while(choice != 0 && choice != 1);
             if(choice == 1){
-                //hàm này chưa build
                 addItemToOrder(orderCount, i);
                 
             }
@@ -1121,12 +1155,7 @@ int updateOrderStatus(void) {
 
 
 int findOrderById(const char *orderId) {
-    /* TODO:
-     * for (int i = 0; i < orderCount; i++)
-     *     if (strcmp(orders[i].orderId, orderId) == 0) return i;
-     * return -1;
-     */
-    
+   
 	for (int i = 0; i < orderCount; i++) {
         if (strcmp(orders[i].orderId, orderId) == 0) {
             return i;
@@ -1237,21 +1266,39 @@ void printOrder(const RepairOrder *o) {
 }
 
 void listOrders(int statusFilter) {
-    /* TODO:
-     * In header: STT | Mã phiếu | SĐT KH | Ngày tạo | Trạng thái | Tổng tiền
-     * Duyệt for; nếu statusFilter == -1 hoặc == orders[i].status thì in
-     */
+    printDivider();
+    printf("  %-4s %-10s %-15s %-20s %-15s %s\n",
+           "STT", "Ma phieu", "SDT KH", "Ngay tao", "Trang thai", "Tong tien");
+    printDivider();
+    for(int i = 0; i < orderCount; i ++){
+        if(statusFilter == -1 || statusFilter == orders[i].status){
+            char dateFormatted[20];
+            char moneyFormatted[30];
+            formatDateTime(orders[i].createdDate, dateFormatted);
+            formatMoney(orders[i].totalAmount, moneyFormatted);
+            printf("  %-4d %-10s %-15s %-20s %-15s %s\n",
+                   i + 1, orders[i].orderId, orders[i].customerPhone,
+                   dateFormatted, getStatusString(orders[i].status), moneyFormatted);
+        }
+    }
 }
 
 void viewCustomerHistory(void) {
-    /* TODO:
-     * 1. Nhập SĐT; findCustomerByPhone() -> nếu -1 báo lỗi return
-     * 2. printCustomer
-     * 3. int indices[MAX_REPAIR_ORDERS];
-     *    int n = findOrdersByPhone(phone, indices, MAX_REPAIR_ORDERS);
-     * 4. if (n == 0) puts("Chua co lich su sua chua.");
-     * 5. else for (int i = 0; i < n; i++) printOrder(&orders[indices[i]]);
-     */
+   
+    char phone[PHONE_LEN];
+    printf("Nhap so dien thoai khach hang: ");
+    scanf("%[^\n]", phone);
+    int index_array[MAX_REPAIR_ORDERS];
+    int n = findOrdersByPhone(phone, index_array, MAX_REPAIR_ORDERS);
+    if (n == 0) {
+        printf("Khach hang chua co lich su sua chua.\n");
+    }
+    else{
+        for(int i = 0; i < n; i++){
+            printOrder(&orders[index_array[i]]);
+        }
+    }
+    
 }
 
 void searchOrderMenu(void) {
