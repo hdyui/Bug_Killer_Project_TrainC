@@ -388,6 +388,23 @@ char * getStatusString(int status){
     }
     return message;
 }
+char * getStatusString(int status){
+    char * message;
+    switch(status){
+        case STATUS_RECEIVED:
+            message = "Tiep nhan";
+            break;
+        case STATUS_REPAIRING:
+            message =  "Dang sua";
+            break;
+        case STATUS_DONE:
+            message = "Hoan thanh";
+            break;
+        default:
+            message = "Khong xac dinh";
+    }
+    return message;
+}
 void printDivider(void) {
     /* TODO: In 60 ký tự '-' rồi xuống dòng */
     for (int i = 0; i < 60; i++) {
