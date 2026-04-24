@@ -210,7 +210,33 @@ int strCmpIgnoreCase(const char *a, const char *b) {
      * 3. Nếu khác nhau, trả về hiệu của hai ký tự đó
      * 4. Nếu đến cuối cả hai, trả về 0
      */
-    return 0; /* placeholder */
+    
+    // Hàm này để so sánh 2 chuỗi nhưng không phân biệt chữ hoa hay chữ thường
+    
+    int i = 0;
+
+    while (a[i] != '\0' && b[i] != '\0') { 
+	// Mình đang muốn so sánh 2 chuỗi với nhau nên nếu 1 trong 2 kết thúc thì việc biến chữ hoa thành chữ thường ở những ký tự sau là không cần thiết
+        char ca = tolower((unsigned char)a[i]);
+        char cb = tolower((unsigned char)b[i]);
+        /*
+        - Hai biến ca và cb này mục tiêu là để biến chữ in hoa thành chữ thường và ở đây ta ép kiểu unsigned char là để tránh lỗi khi char âm thì đây
+        việc ép kiểu là cách viết an toàn
+        */
+
+        if (ca != cb) {
+            return ca - cb;  // khác nhau → trả về độ lệch
+        }
+        /*
+        - Mục đích của bước này là để cho biết 2 chuỗi này khác nhau ở đâu và chuỗi đc so sánh theo thứ tự từ trái sang phải thì nếu khác nhau ở ký tự
+        đầu tiên luôn thì output luôn kết quả, nếu ko có bước này thì nó sẽ duyệt hết chuỗi luôn 
+        */
+
+        i++;
+    }
+
+    // nếu 1 trong 2 chuỗi kết thúc trước
+    return tolower((unsigned char)a[i]) - tolower((unsigned char)b[i]); // Nếu cả 2 chuỗi có độ dài bằng nhau thì lúc này nó sẽ tương đương return 0
 }
 
 void strTrim(char *str) {
@@ -318,7 +344,7 @@ void formatDateTime(time_t t, char *buffer) {
     
     */
 }
-}
+
 
 
 void getTodayString(char *buffer) {
@@ -509,6 +535,7 @@ void saveAllData(void) {
  * SECTION 7: CUSTOMER
  * ========================================================= */
 
+// ko cần lắm
 void initCustomers(void) {
     /* TODO: customerCount = 0; memset(customers, 0, sizeof(customers)); */
 }
@@ -594,6 +621,7 @@ int addCustomer(void) {
     customers[customerCount].orderCount = 0;
     generateCustomerId(customerCount + 1, customers[customerCount].customerId);
     customerCount++;
+    printf("CSC %d", customerCount);
     saveCustomers();
     printSuccess("Da them khach hang thanh cong!");
     printf("  Ma KH duoc cap: %s\n", customers[customerCount - 1].customerId);
@@ -609,7 +637,88 @@ int editCustomer(void) {
      * 5. Nhập và validate giá trị mới, gán vào customers[idx]
      * 6. saveCustomers(); printSuccess(); return 1;
      */
-    return 0; /* placeholder */
+    char phone[PHONE_LEN];
+    int  idx;
+    int  choice;
+ 
+    /* Bước 1: nhập SĐT cần sửa */
+    printf("  Nhap SDT khach hang can sua: ");
+    scanf(" %14s", phone);
+    while (getchar() != '\n');
+ 
+    /* Bước 2: tìm khách theo SĐT */
+    idx = findCustomerByPhone(phone);
+    if (idx == -1) {
+        printError("Khong tim thay khach hang voi SDT nay.");
+        return 0;
+    }
+ 
+    /* Bước 3: in thông tin hiện tại để người dùng xem trước khi sửa */
+    printCustomer(&customers[idx]);
+ 
+    /* Bước 4: hiển thị menu chọn trường muốn sửa */
+    printf("  [1] Sua ho ten\n");
+    printf("  [2] Sua bien so xe\n");
+    printf("  [3] Sua loai xe\n");
+    printf("  [0] Huy\n");
+    printf("  Lua chon: ");
+    scanf(" %d", &choice);
+    while (getchar() != '\n');
+ 
+    /* Bước 5: nhập giá trị mới, validate rồi gán vào customers[idx] */
+    if (choice == 1) {
+ 
+        /* Sửa họ tên - không được rỗng */
+        do {
+            printf("  Ho ten moi: ");
+            scanf(" %99[^\n]", customers[idx].fullName);
+            while (getchar() != '\n');
+            if (customers[idx].fullName[0] == '\0') {
+                printError("Ho ten khong duoc de trong.");
+            }
+        } while (customers[idx].fullName[0] == '\0');
+ 
+    } else if (choice == 2) {
+ 
+        /* Sửa biển số*/
+        char newPlate[PLATE_LEN];
+        while (1) {
+            printf("  Bien so xe moi: ");
+            scanf(" %14s", newPlate);
+            while (getchar() != '\n');
+            if (isValidPlate(newPlate) == 0) {
+                printError("Bien so khong hop le.");
+                continue;
+            }
+            break;
+        }
+        strcpy(customers[idx].carPlate, newPlate);
+ 
+    } else if (choice == 3) {
+ 
+        /* Sửa loại xe - không được rỗng */
+        do {
+            printf("  Loai xe moi: ");
+            scanf(" %29[^\n]", customers[idx].carType);
+            while (getchar() != '\n');
+            if (customers[idx].carType[0] == '\0') {
+                printError("Loai xe khong duoc de trong.");
+            }
+        } while (customers[idx].carType[0] == '\0');
+ 
+    } else if (choice == 0) {
+        puts("  Da huy thao tac.");
+        return 0;
+ 
+    } else {
+        printError("Lua chon khong hop le.");
+        return 0;
+    }
+ 
+    /* Bước 6: lưu file và thông báo thành công */
+    saveCustomers();
+    printSuccess("Da cap nhat thong tin khach hang.");
+    return 1;
 }
 
 int findCustomerByPhone(const char *phone) {
@@ -629,6 +738,12 @@ int findCustomerByPlate(const char *plate) {
      *     if (strCmpIgnoreCase(customers[i].carPlate, plate) == 0) return i;
      * return -1;
      */
+    int i;
+    for (i = 0; i < customerCount; i++) {
+        if (strCmpIgnoreCase(customers[i].carPlate, plate) == 0) {
+            return i;
+        }
+    }
     return -1; /* placeholder */
 }
 
@@ -638,6 +753,43 @@ void searchCustomerMenu(void) {
      * Nhập từ khoá, gọi hàm tìm tương ứng
      * In printCustomer nếu tìm thấy, printError nếu không
      */
+    int choice;
+    int idx;
+ 
+    /* Hiển thị lựa chọn tìm kiếm */
+    printf("  [1] Tim theo SDT\n");
+    printf("  [2] Tim theo bien so xe\n");
+    printf("  Lua chon: ");
+    scanf(" %d", &choice);
+    while (getchar() != '\n');
+ 
+    idx = -1;
+ 
+    if (choice == 1) {
+        char phone[PHONE_LEN];
+        printf("  Nhap SDT: ");
+        scanf(" %14s", phone);
+        while (getchar() != '\n');
+        idx = findCustomerByPhone(phone);
+ 
+    } else if (choice == 2) {
+        char plate[PLATE_LEN];
+        printf("  Nhap bien so xe: ");
+        scanf(" %14s", plate);
+        while (getchar() != '\n');
+        idx = findCustomerByPlate(plate);
+ 
+    } else {
+        printError("Lua chon khong hop le.");
+        return;
+    }
+ 
+    /* In kết quả */
+    if (idx == -1) {
+        printError("Khong tim thay khach hang.");
+    } else {
+        printCustomer(&customers[idx]);
+    }
 }
 
 void printCustomer(const Customer *c) {
@@ -646,13 +798,14 @@ void printCustomer(const Customer *c) {
      * printf("  Ho ten   : %s\n", c->fullName);
      * ... các trường còn lại
      */
-     
-    printf("  Ma KH    : %s\n", c->customerId);
-    printf("  Ho ten   : %s\n", c->fullName);
-    printf("  SDT      : %s\n", c->phoneNumber);
-    printf("  Bien so  : %s\n", c->carPlate);
-    printf("  Loai xe  : %s\n", c->carType);
-    printf("  So phieu : %d\n", c->orderCount);
+    printDivider();
+    printf("  Ma KH     : %s\n", c->customerId);
+    printf("  Ho ten    : %s\n", c->fullName);
+    printf("  SDT       : %s\n", c->phoneNumber);
+    printf("  Bien so   : %s\n", c->carPlate);
+    printf("  Loai xe   : %s\n", c->carType);
+    printf("  So phieu  : %d\n", c->orderCount);
+    printDivider();
 }
 
 void listAllCustomers(void) {
@@ -661,8 +814,32 @@ void listAllCustomers(void) {
      * In header bảng: STT | Mã KH | Họ tên | SĐT | Biển số | Loại xe | Phiếu
      * Duyệt vòng for in từng dòng
      */
+    /* Kiểm tra danh sách rỗng */
+    if (customerCount == 0) {
+        puts("  Chua co khach hang nao trong he thong.");
+        return;
+    }
+ 
+    /* In header bảng */
+    printDivider();
+    printf("  %-4s %-10s %-25s %-12s %-12s %-15s %s\n",
+           "STT", "Ma KH", "Ho ten", "SDT", "Bien so", "Loai xe", "Phieu");
+    printDivider();
+ 
+    /* Duyệt vòng for in từng dòng */
+    for (int i = 0; i < customerCount; i++) {
+        printf("  %-4d %-10s %-25s %-12s %-12s %-15s %d\n",
+               i + 1,
+               customers[i].customerId,
+               customers[i].fullName,
+               customers[i].phoneNumber,
+               customers[i].carPlate,
+               customers[i].carType,
+               customers[i].orderCount);
+    }
+    printDivider();
+    printf("  Tong so khach hang: %d\n", customerCount);
 }
-
 /* =========================================================
  * SECTION 8: SERVICE
  * ========================================================= */
@@ -950,23 +1127,28 @@ int findOrderById(const char *orderId) {
 }
 
 int findOrdersByPhone(const char *phone, int *result, int maxResult) {
-    int index = -1;
-    for(int i = 0; i < orderCount; i++){
-        if(strcmp(orders[i].customerPhone, phone) == 0){
-            index = i;
-            break;
+    int count = 0;
+
+    for (int i = 0; i < orderCount; i++) {
+        if (count >= maxResult){
+            break; 
+        }
+
+        if (strcmp(orders[i].customerPhone, phone) == 0) {
+            result[count] = i; 
+            count++;          
         }
     }
-    return index; 
+    return count; 
 }
-
 int findOrdersByPlate(const char *plate, int *result, int maxResult) {
-    /* TODO:
-     * int cIdx = findCustomerByPlate(plate);
-     * if (cIdx == -1) return 0;
-     * return findOrdersByPhone(customers[cIdx].phoneNumber, result, maxResult);
-     */
-    return 0; /* placeholder */
+    
+    int cIdx = findCustomerByPlate(plate);
+    if(cIdx == -1) {
+        return 0;
+    }
+
+    return findOrdersByPhone(customers[cIdx].phoneNumber, result, maxResult); /* placeholder */
 }
 
 void printOrder(const RepairOrder *o) {
@@ -1064,10 +1246,49 @@ void viewCustomerHistory(void) {
 }
 
 void searchOrderMenu(void) {
-    /* TODO:
-     * [1] Tìm theo mã phiếu -> findOrderById -> printOrder
-     * [2] Tìm theo biển số  -> findOrdersByPlate -> printOrder từng phiếu
-     */
+    
+    int choice;
+    do{
+        printf("Lua chon tim kiem:\n");
+        printf("[1] Tim theo ma phieu\n");
+        printf("[2] Tim theo bien so xe\n");
+        printDivider();
+        printf("Nhap lua chon: ");
+        scanf("%d", &choice);
+        while (getchar() != '\n');
+        if(choice != 1 && choice != 2){
+            printf("Vui long nhap [1] hoac [2]\n");
+        }
+        
+    }
+    while(choice != 1 && choice != 2);
+    if(choice == 1){
+        char OrderId[ID_LEN];
+        printf("Nhap ma phieu: ");
+        scanf("%[^\n]", OrderId);
+        int idx = findOrderById(OrderId); 
+        if(idx = -1){
+            printf("Khong tim thay phieu\n");
+        }
+        else{
+            printOrder(&orders[idx]);
+        }
+    }
+    else if(choice == 2){
+        char plate[PLATE_LEN];
+        printf("Nhap bien so xe: ");
+        scanf("%[^\n]", plate);
+        int idxArr[MAX_REPAIR_ORDERS];
+        int n = findOrdersByPlate(plate, idxArr, MAX_REPAIR_ORDERS);
+        if(n == 0){
+            printf("Khong tim thay phieu nao voi bien so xe nay\n");
+        }
+        else{
+            for(int i = 0; i < n; i++){
+                printOrder(&orders[idxArr[i]]);
+            }
+        }
+    }
 }
 
 /* =========================================================
