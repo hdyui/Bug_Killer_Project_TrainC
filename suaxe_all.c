@@ -39,9 +39,9 @@
 #define STATUS_DONE      2   /* Hoàn thành */
 
 /* --- Đường dẫn file --- */
-#define FILE_CUSTOMERS "data/customers.dat"
-#define FILE_ORDERS    "data/orders.dat"
-#define FILE_SERVICES  "data/services.dat"
+#define FILE_CUSTOMERS "none.txt"
+#define FILE_ORDERS    "chuaco.txt"
+#define FILE_SERVICES  "services.txt"
 
 /* --- Màu ANSI --- */
 #define COLOR_RESET  "\033[0m"
