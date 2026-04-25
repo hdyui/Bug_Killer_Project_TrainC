@@ -545,15 +545,15 @@ int saveCustomers(void) {
 }
 
 int loadCustomers(void) {
-    /* TODO:
-     * FILE *fp = fopen(FILE_CUSTOMERS, "rb");
-     * if (!fp) return 0;  -- lần đầu chạy, bình thường
-     * fread(&customerCount, sizeof(int), 1, fp);
-     * fread(customers, sizeof(Customer), customerCount, fp);
-     * fclose(fp);
-     * return 1;
-     */
-    return 0; /* placeholder */
+    FILE *fp = fopen(FILE_CUSTOMERS, "rb");
+    if (!fp) return 0; 
+    
+    fread(&customerCount, sizeof(int), 1, fp);
+    fread(customers, sizeof(Customer), customerCount, fp);
+    
+    fclose(fp);
+    return 1;
+
 }
 
 int saveOrders(void) {
@@ -583,8 +583,14 @@ int saveOrders(void) {
 }
 
 int loadOrders(void) {
-    /* TODO: Tương tự loadCustomers cho orders[] / FILE_ORDERS */
-    return 0; /* placeholder */
+    FILE *fp = fopen(FILE_ORDERS, "rb");
+    if (!fp) return 0; 
+    
+    fread(&orderCount, sizeof(int), 1, fp);
+    fread(orders, sizeof(RepairOrder), orderCount, fp); 
+    
+    fclose(fp);
+    return 1;
 }
 
 int saveServices(void) {
@@ -638,7 +644,11 @@ int loadServices(void) {
 
 void loadAllData(void) {
     /* TODO: Gọi loadCustomers(), loadServices(), loadOrders() */
+    loadCustomers();
+    loadServices();
+    loadOrders();
 }
+
 
 void saveAllData(void) {
     /* TODO: Gọi saveCustomers(), saveServices(), saveOrders() */
