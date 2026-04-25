@@ -1233,6 +1233,7 @@ int createRepairOrder(void) {
     do{
         printf("Nhap tinh trang xe cua ban: ");
         scanf("%[^\n]", symptom);
+        while (getchar() != '\n');
     }
     while(strlen(symptom) == 0);
     strcpy(orders[orderCount].symptom, symptom);
