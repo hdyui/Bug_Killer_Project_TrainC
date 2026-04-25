@@ -1384,13 +1384,21 @@ int updateOrderStatus(void) {
 
 
 int findOrderById(const char *orderId) {
-   
-	for (int i = 0; i < orderCount; i++) {
-        if (strcmp(orders[i].orderId, orderId) == 0) {
-            return i;
+    int left = 0, right = orderCount - 1;
+    while(left <= right){
+        int mid = left + (right - left) / 2;
+        if(strcmp(orderId, orders[mid].orderId) < 0){
+            right = mid - 1;
+        }
+        else if(strcmp(orderId, orders[mid].orderId) > 0){
+            left = mid + 1;
+        }
+        else{
+            return mid;
         }
     }
-    return -1; /* placeholder */
+    return -1;
+
 }
 
 int findOrdersByPhone(const char *phone, int *result, int maxResult) {
