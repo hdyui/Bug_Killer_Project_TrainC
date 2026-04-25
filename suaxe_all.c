@@ -129,7 +129,6 @@ void   printStatus(int status);
 void   formatMoney(double amount, char *buffer);
 
 /* fileio */
-void   ensureDataDir(void);
 int    saveCustomers(void);
 int    loadCustomers(void);
 int    saveOrders(void);
