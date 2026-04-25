@@ -515,7 +515,7 @@ int saveCustomers(void) {
      * return 1;
      */
     
-    FILE *fp = fopen(FILE_CUSTOMERS, "wb"); 
+    FILE *fp = fopen(FILE_CUSTOMERS, "w+"); 
     /*
 	Mở file ở chế độ ghi nhị phân (chọn ghi nhị phân là vì mình dùng fwrite và nhóm dùng fwrite vì nó tối ưu hơn về tốc độ, ít lỗi hơn khi làm việc 
 	với struct)
