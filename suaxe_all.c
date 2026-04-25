@@ -1231,28 +1231,24 @@ int createRepairOrder(void) {
     orders[orderCount].itemCount = 0;
     orders[orderCount].totalAmount = 0;
 
-    printf("%-20s %-20s %-20s %-20s\n",
-        "ID", "Name", "Unit price", "Active");
-    for(int i = 0; i < serviceCount; i++){
-        int choice;
-        if(services[i].isActive == 1){
-            do{
-                printf("%-20s %-20s %-20s %-20s\n",
-                services[i].serviceId, services[i].name, 
-                services[i].unitPrice, services[i].isActive);
 
-                printf("[1] Su dung dich vu nay\n");
-                printf("[0] Bo qua dich vu nay\n");
-                printf("Nhap lua chon: ");
-                scanf("%d", &choice);
-            }
-            while(choice != 0 && choice != 1);
-            if(choice == 1){
-                addItemToOrder(orderCount, i);
-                
-            }
+    listAllServices();
+    char serviceId[ID_LEN];
+    do{
+        printf("Nhap ma dich vu can them vao phieu (VD: SV000001), nhap 0 de ket thuc: ");
+        scanf("%[^\n]", serviceId);
+        while (getchar() != '\n');
+        
+        int serviceIdx = findServiceById(serviceId);
+        if(serviceIdx == -1 || services[serviceIdx].isActive == 0){
+            printf("Khong tim thay dich vu hoac dich vu khong hoat dong.\n");
+            continue;
         }
+        addItemToOrder(orderCount, serviceIdx);
+        
     }
+    while(strcmp(serviceId, "0") != 0);
+        
     orderCount++;
     customers[index].orderCount++;
 
