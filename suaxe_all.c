@@ -515,7 +515,7 @@ int saveCustomers(void) {
      * return 1;
      */
     
-    FILE *fp = fopen(FILE_CUSTOMERS, "wb"); 
+    FILE *fp = fopen(FILE_CUSTOMERS, "w+"); 
     /*
 	Mở file ở chế độ ghi nhị phân (chọn ghi nhị phân là vì mình dùng fwrite và nhóm dùng fwrite vì nó tối ưu hơn về tốc độ, ít lỗi hơn khi làm việc 
 	với struct)
@@ -545,7 +545,7 @@ int saveCustomers(void) {
 }
 
 int loadCustomers(void) {
-    FILE *fp = fopen(FILE_CUSTOMERS, "rb");
+    FILE *fp = fopen(FILE_CUSTOMERS, "r+");
     if (!fp) return 0; 
     
     fread(&customerCount, sizeof(int), 1, fp);
@@ -559,7 +559,7 @@ int loadCustomers(void) {
 int saveOrders(void) {
     /* TODO: Tương tự saveCustomers cho orders[] / FILE_ORDERS */
     
-	FILE *fp = fopen(FILE_ORDERS, "wb"); 
+	FILE *fp = fopen(FILE_ORDERS, "w+"); 
     // Mở file orders.dat ở chế độ ghi nhị phân (giải thích tương tự hàm saveCustomers)
     // Nếu chưa có thì tạo mới, nếu có rồi thì ghi đè lên
 
@@ -583,7 +583,7 @@ int saveOrders(void) {
 }
 
 int loadOrders(void) {
-    FILE *fp = fopen(FILE_ORDERS, "rb");
+    FILE *fp = fopen(FILE_ORDERS, "r+");
     if (!fp) return 0; 
     
     fread(&orderCount, sizeof(int), 1, fp);
@@ -596,7 +596,7 @@ int loadOrders(void) {
 int saveServices(void) {
     /* TODO: Tương tự saveCustomers cho services[] / FILE_SERVICES */
     
-	FILE *fp = fopen(FILE_SERVICES, "wb"); 
+	FILE *fp = fopen(FILE_SERVICES, "w+"); 
     // Mở file services.dat ở chế độ ghi nhị phân
 
     if (!fp) {
@@ -621,7 +621,7 @@ int saveServices(void) {
 int loadServices(void) {
     /* TODO: Tương tự loadCustomers cho services[] / FILE_SERVICES */
    
-   FILE *fp = fopen(FILE_SERVICES, "rb"); 
+   FILE *fp = fopen(FILE_SERVICES, "r+"); 
     // Mở file services.dat ở chế độ đọc nhị phân
 
     if (!fp) {
@@ -1233,6 +1233,7 @@ int createRepairOrder(void) {
     do{
         printf("Nhap tinh trang xe cua ban: ");
         scanf("%[^\n]", symptom);
+        while (getchar() != '\n');
     }
     while(strlen(symptom) == 0);
     strcpy(orders[orderCount].symptom, symptom);
@@ -1383,13 +1384,21 @@ int updateOrderStatus(void) {
 
 
 int findOrderById(const char *orderId) {
-   
-	for (int i = 0; i < orderCount; i++) {
-        if (strcmp(orders[i].orderId, orderId) == 0) {
-            return i;
+    int left = 0, right = orderCount - 1;
+    while(left <= right){
+        int mid = left + (right - left) / 2;
+        if(strcmp(orderId, orders[mid].orderId) < 0){
+            right = mid - 1;
+        }
+        else if(strcmp(orderId, orders[mid].orderId) > 0){
+            left = mid + 1;
+        }
+        else{
+            return mid;
         }
     }
-    return -1; /* placeholder */
+    return -1;
+
 }
 
 int findOrdersByPhone(const char *phone, int *result, int maxResult) {
