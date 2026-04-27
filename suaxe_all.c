@@ -515,7 +515,7 @@ int saveCustomers(void) {
      * return 1;
      */
     
-    FILE *fp = fopen(FILE_CUSTOMERS, "w+"); 
+    FILE *fp = fopen(FILE_CUSTOMERS, "wb"); 
     /*
 	Mở file ở chế độ ghi nhị phân (chọn ghi nhị phân là vì mình dùng fwrite và nhóm dùng fwrite vì nó tối ưu hơn về tốc độ, ít lỗi hơn khi làm việc 
 	với struct)
@@ -545,7 +545,7 @@ int saveCustomers(void) {
 }
 
 int loadCustomers(void) {
-    FILE *fp = fopen(FILE_CUSTOMERS, "r+");
+    FILE *fp = fopen(FILE_CUSTOMERS, "rb");
     if (!fp) return 0; 
     
     fread(&customerCount, sizeof(int), 1, fp);
@@ -559,7 +559,7 @@ int loadCustomers(void) {
 int saveOrders(void) {
     /* TODO: Tương tự saveCustomers cho orders[] / FILE_ORDERS */
     
-	FILE *fp = fopen(FILE_ORDERS, "w+"); 
+	FILE *fp = fopen(FILE_ORDERS, "wb"); 
     // Mở file orders.dat ở chế độ ghi nhị phân (giải thích tương tự hàm saveCustomers)
     // Nếu chưa có thì tạo mới, nếu có rồi thì ghi đè lên
 
@@ -583,7 +583,7 @@ int saveOrders(void) {
 }
 
 int loadOrders(void) {
-    FILE *fp = fopen(FILE_ORDERS, "r+");
+    FILE *fp = fopen(FILE_ORDERS, "rb");
     if (!fp) return 0; 
     
     fread(&orderCount, sizeof(int), 1, fp);
@@ -596,7 +596,7 @@ int loadOrders(void) {
 int saveServices(void) {
     /* TODO: Tương tự saveCustomers cho services[] / FILE_SERVICES */
     
-	FILE *fp = fopen(FILE_SERVICES, "w+"); 
+	FILE *fp = fopen(FILE_SERVICES, "wb"); 
     // Mở file services.dat ở chế độ ghi nhị phân
 
     if (!fp) {
@@ -620,9 +620,9 @@ int saveServices(void) {
 
 int loadServices(void) {
     /* TODO: Tương tự loadCustomers cho services[] / FILE_SERVICES */
-   
-   FILE *fp = fopen(FILE_SERVICES, "r+"); 
-    // Mở file services.dat ở chế độ đọc nhị phân
+   initServices();
+   FILE *fp = fopen(FILE_SERVICES, "rb"); 
+    // Mở file services
 
     if (!fp) {
         printError("Khong mo duoc file!"); // Không mở được file thì có thể là lần đầu chạy chưa có file
@@ -634,7 +634,7 @@ int loadServices(void) {
 
     fread(services, sizeof(Service), serviceCount, fp); 
     // Đọc toàn bộ mảng services từ file vào RAM
-
+    printf("%d", serviceCount);
     fclose(fp); 
     // Đóng file
 
@@ -976,7 +976,8 @@ void listAllCustomers(void) {
  * ========================================================= */
 
 void initServices(void) {
-    /* TODO: serviceCount = 0; memset(services, 0, sizeof(services)); */
+    serviceCount = 0;
+    memset(services, 0, sizeof(services));
 }
 
 int addService(void) {
@@ -1756,7 +1757,7 @@ static void menuService(void) {
         switch (choice) {
             case 1: addService();      break;
             case 2: editService();     break;
-            case 3: listAllServices(); break;
+            case 3: loadServices(); listAllServices(); break;
             case 0: break;
             default: printError("Lua chon khong hop le.");
         }
