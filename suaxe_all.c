@@ -41,7 +41,7 @@
 /* --- Đường dẫn file --- */
 #define FILE_CUSTOMERS "none.txt"
 #define FILE_ORDERS    "chuaco.txt"
-#define FILE_SERVICES  "services.bin"
+#define FILE_SERVICES  "services.txt"
 
 /* --- Màu ANSI --- */
 #define COLOR_RESET  "\033[0m"
