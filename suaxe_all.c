@@ -1067,6 +1067,7 @@ int editService(void) {
     printf("  Dich vu dang chon: %s - %s\n", services[idx].serviceId, services[idx].name);
     printf("  [1] Sua ten dich vu\n");
     printf("  [2] Sua don gia\n");
+    printf("  [3] Kich hoat/Tam ngung dich vu\n");
     printf("  [0] Huy\n");
     printf("  Lua chon: ");
     scanf("%d", &choice);
@@ -1101,7 +1102,12 @@ int editService(void) {
         } while (newPrice <= 0);
         services[idx].unitPrice = newPrice;
 
-    } else if (choice == 0) {
+    } 
+    else if (choice == 3) {
+        services[idx].isActive = !services[idx].isActive;
+        printf("  Dich vu da duoc %s.\n", services[idx].isActive ? "kich hoat" : "tam ngung");
+    }
+    else if (choice == 0) {
         printf("  Da huy thao tac.\n");
         return 0;
     } else {
@@ -1119,7 +1125,7 @@ int editService(void) {
 int findServiceById(const char *serviceId) {
     int index = -1;
     for(int i = 0; i < serviceCount; i++){
-        if(strcmp(services[i].serviceId, serviceId) == 0 && services[i].isActive == 1){
+        if(strcmp(services[i].serviceId, serviceId) == 0){
             index = i;
             break;
         }
@@ -1132,34 +1138,35 @@ void listAllServices(void) {
      * In header: STT | Mã DV | Tên dịch vụ | Đơn giá
      * Duyệt for, chỉ in isActive == 1; dùng formatMoney cho đơn giá
      */
-    /* Đếm xem có bao nhiêu dịch vụ đang Active */
     int activeCount = 0;
     for (int i = 0; i < serviceCount; i++) {
-        if (services[i].isActive == 1) activeCount++;
+        if (services[i].isActive == 1) {
+            activeCount++;
+        }
     }
 
-    if (activeCount == 0) {
-        printf("  Chua co dich vu nao hoat dong trong he thong.\n");
+
+    if (serviceCount == 0) {
+        printf("  Chua co dich vu nao trong he thong.\n");
         return;
     }
 
     /* In Header */
     printDivider();
-    printf("  %-4s %-10s %-30s %-20s\n", "STT", "Ma DV", "Ten dich vu", "Don gia");
+    printf("  %-4s %-10s %-30s %-20s %-20s\n", "STT", "Ma DV", "Ten dich vu", "Don gia", "Trang thai");
     printDivider();
 
 
     int stt = 1;
     for (int i = 0; i < serviceCount; i++) {
-        if (services[i].isActive == 1) {
-            char priceBuf[30];
-            formatMoney(services[i].unitPrice, priceBuf); 
-            printf("  %-4d %-10s %-30s %-20s\n",
-                   stt++,
-                   services[i].serviceId,
-                   services[i].name,
-                   priceBuf);
-        }
+        char priceBuf[30];
+        formatMoney(services[i].unitPrice, priceBuf); 
+        printf("  %-4d %-10s %-30s %-20s %-20s\n",
+                stt++,
+                services[i].serviceId,
+                services[i].name,
+                priceBuf,
+                services[i].isActive ? "Hoat dong" : "Khong hoat dong");
     }
     printDivider();
     printf("  Tong so dich vu dang hoat dong: %d\n", activeCount);
