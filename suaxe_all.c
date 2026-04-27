@@ -620,7 +620,6 @@ int saveServices(void) {
 
 int loadServices(void) {
     /* TODO: Tương tự loadCustomers cho services[] / FILE_SERVICES */
-   initServices();
    FILE *fp = fopen(FILE_SERVICES, "rb"); 
     // Mở file services
 
@@ -634,7 +633,6 @@ int loadServices(void) {
 
     fread(services, sizeof(Service), serviceCount, fp); 
     // Đọc toàn bộ mảng services từ file vào RAM
-    printf("%d", serviceCount);
     fclose(fp); 
     // Đóng file
 
