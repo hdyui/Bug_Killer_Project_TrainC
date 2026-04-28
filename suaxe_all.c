@@ -39,9 +39,9 @@
 #define STATUS_DONE      2   /* Hoàn thành */
 
 /* --- Đường dẫn file --- */
-#define FILE_CUSTOMERS "none.txt"
-#define FILE_ORDERS    "chuaco.txt"
-#define FILE_SERVICES  "services.bin"
+#define FILE_CUSTOMERS "customers.txt"
+#define FILE_ORDERS    "orders.txt"
+#define FILE_SERVICES  "services.txt"
 
 /* --- Màu ANSI --- */
 #define COLOR_RESET  "\033[0m"
@@ -506,183 +506,222 @@ void formatMoney(double amount, char *buffer) {
  * ========================================================= */
 
 int saveCustomers(void) {
-    /* TODO:
-     * FILE *fp = fopen(FILE_CUSTOMERS, "wb");
-     * if (!fp) { printError("Khong the ghi file khach hang."); return 0; }
-     * fwrite(&customerCount, sizeof(int), 1, fp);
-     * fwrite(customers, sizeof(Customer), customerCount, fp);
-     * fclose(fp);
-     * return 1;
-     */
-    
-<<<<<<< HEAD
-    FILE *fp = fopen(FILE_CUSTOMERS, "wb"); 
-=======
-    FILE *fp = fopen(FILE_CUSTOMERS, "w+"); 
->>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
-    /*
-	Mở file ở chế độ ghi nhị phân (chọn ghi nhị phân là vì mình dùng fwrite và nhóm dùng fwrite vì nó tối ưu hơn về tốc độ, ít lỗi hơn khi làm việc 
-	với struct)
-    Nếu file chưa tồn tại thì sẽ tạo mới
-    Nếu đã tồn tại thì sẽ ghi đè
-	*/ 
+    FILE *fp = fopen(FILE_CUSTOMERS, "w");
 
-    if (!fp) { 
-        printError("Khong the ghi file khach hang."); 
-        return 0; 
-        // Nếu mở file thất bại (vd: không có thư mục data) thù sẽ báo lỗi và return 0 (fail)
+    if (!fp) {
+        printError("Khong the ghi file khach hang.");
+        return 0;
     }
 
-    fwrite(&customerCount, sizeof(int), 1, fp); 
-    // Ghi số lượng khách hàng vào file trước để lúc load biết cần đọc bao nhiêu phần tử
+    fprintf(fp, "%d\n", customerCount);
 
-    fwrite(customers, sizeof(Customer), customerCount, fp); 
-    // Ghi toàn bộ mảng customers vào file
-    // mỗi phần tử có kích thước sizeof(Customer)
-    // tổng cộng customerCount phần tử
+    for (int i = 0; i < customerCount; i++) {
+        fprintf(fp, "%s|%s|%s|%s|%s|%d\n",
+            customers[i].customerId,
+            customers[i].fullName,
+            customers[i].phoneNumber,
+            customers[i].carPlate,
+            customers[i].carType,
+            customers[i].orderCount
+        );
+    }
 
-    fclose(fp); 
-    // Đóng file lại 
-
-    return 1; 
-    // Trả về 1 = lưu thành công
+    fclose(fp);
+    return 1;
 }
 
 int loadCustomers(void) {
-<<<<<<< HEAD
-    FILE *fp = fopen(FILE_CUSTOMERS, "rb");
-=======
-    FILE *fp = fopen(FILE_CUSTOMERS, "r+");
->>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
-    if (!fp) return 0; 
-    
-    fread(&customerCount, sizeof(int), 1, fp);
-    fread(customers, sizeof(Customer), customerCount, fp);
-    
+    FILE *fp = fopen(FILE_CUSTOMERS, "r");
+    if (!fp) return 0;
+
+    fscanf(fp, "%d\n", &customerCount);
+
+    for (int i = 0; i < customerCount; i++) {
+        fscanf(fp, "%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%d\n",
+            customers[i].customerId,
+            customers[i].fullName,
+            customers[i].phoneNumber,
+            customers[i].carPlate,
+            customers[i].carType,
+            &customers[i].orderCount
+        );
+    }
+
     fclose(fp);
     return 1;
 
 }
 
 int saveOrders(void) {
-    /* TODO: Tương tự saveCustomers cho orders[] / FILE_ORDERS */
-    
-<<<<<<< HEAD
-	FILE *fp = fopen(FILE_ORDERS, "wb"); 
-=======
-	FILE *fp = fopen(FILE_ORDERS, "w+"); 
->>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
-    // Mở file orders.dat ở chế độ ghi nhị phân (giải thích tương tự hàm saveCustomers)
-    // Nếu chưa có thì tạo mới, nếu có rồi thì ghi đè lên
+    FILE *fp = fopen(FILE_ORDERS, "w");
 
     if (!fp) {
-        printError("Khong the ghi file phieu sua."); 
-        return 0; 
-        // Nếu mở file thất bại thì báo lỗi và return 0
+        printError("Khong the ghi file phieu sua.");
+        return 0;
     }
 
-    fwrite(&orderCount, sizeof(int), 1, fp); 
-    // Ghi số lượng phiếu sửa (orderCount) vào đầu file để lúc load biết cần đọc bao nhiêu phần tử
+    fprintf(fp, "%d\n", orderCount);
 
-    fwrite(orders, sizeof(RepairOrder), orderCount, fp); 
-    // Ghi toàn bộ mảng orders xuống file, mỗi phần tử có kích thước sizeof(RepairOrder)
+    for (int i = 0; i < orderCount; i++) {
+        RepairOrder *o = &orders[i];
 
-    fclose(fp); 
-    // Đóng file 
+        fprintf(fp, "%s|%s|%s|%d|%ld|%ld|%d|%.2f\n",
+            o->orderId,
+            o->customerPhone,
+            o->symptom,
+            o->status,
+            o->createdDate,
+            o->updatedDate,
+            o->itemCount,
+            o->totalAmount
+        );
 
-    return 1; 
-    // Lưu thành công
+        for (int j = 0; j < o->itemCount; j++) {
+            RepairItem *it = &o->items[j];
+
+            fprintf(fp, "%s|%s|%d|%.2f|%.2f\n",
+                it->serviceId,
+                it->serviceName,
+                it->quantity,
+                it->unitPrice,
+                it->subtotal
+            );
+        }
+    }
+
+    fclose(fp);
+    return 1;
 }
 
 int loadOrders(void) {
-<<<<<<< HEAD
-    FILE *fp = fopen(FILE_ORDERS, "rb");
-=======
-    FILE *fp = fopen(FILE_ORDERS, "r+");
->>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
-    if (!fp) return 0; 
-    
-    fread(&orderCount, sizeof(int), 1, fp);
-    fread(orders, sizeof(RepairOrder), orderCount, fp); 
-    
+    FILE *fp = fopen(FILE_ORDERS, "r");
+    if (!fp) return 0;
+
+    fscanf(fp, "%d\n", &orderCount);
+
+    for (int i = 0; i < orderCount; i++) {
+        RepairOrder *o = &orders[i];
+
+        fscanf(fp, "%[^|]|%[^|]|%[^|]|%d|%ld|%ld|%d|%lf\n",
+            o->orderId,
+            o->customerPhone,
+            o->symptom,
+            &o->status,
+            &o->createdDate,
+            &o->updatedDate,
+            &o->itemCount,
+            &o->totalAmount
+        );
+
+        for (int j = 0; j < o->itemCount; j++) {
+            RepairItem *it = &o->items[j];
+
+            fscanf(fp, "%[^|]|%[^|]|%d|%lf|%lf\n",
+                it->serviceId,
+                it->serviceName,
+                &it->quantity,
+                &it->unitPrice,
+                &it->subtotal
+            );
+        }
+    }
+
     fclose(fp);
     return 1;
 }
 
 int saveServices(void) {
-    /* TODO: Tương tự saveCustomers cho services[] / FILE_SERVICES */
-    
-<<<<<<< HEAD
-	FILE *fp = fopen(FILE_SERVICES, "wb"); 
-=======
-	FILE *fp = fopen(FILE_SERVICES, "w+"); 
->>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
-    // Mở file services.dat ở chế độ ghi nhị phân
+    FILE *fp = fopen(FILE_SERVICES, "w");
+    // Mở file ở chế độ ghi text (xóa nội dung cũ, ghi mới)
 
     if (!fp) {
-        printError("Khong the ghi file dich vu."); 
-        return 0; 
-        // Nếu mở file fail thì sẽ báo lỗi
+        printError("Khong the ghi file dich vu.");
+        return 0;
     }
 
-    fwrite(&serviceCount, sizeof(int), 1, fp); 
-    // Ghi số lượng dịch vụ
+    for (int i = 0; i < serviceCount; i++) {
+        // Ghi từng service theo đúng format
 
-    fwrite(services, sizeof(Service), serviceCount, fp); 
-    // Ghi toàn bộ mảng services
+        fprintf(fp, "Service ID  : %s\n", services[i].serviceId);
+        // In mã dịch vụ
 
-    fclose(fp); 
+        fprintf(fp, "Name        : %s\n", services[i].name);
+        // In tên dịch vụ
+
+        fprintf(fp, "Unit Price  : %.2f\n", services[i].unitPrice);
+        // In giá, giữ 2 số sau dấu phẩy
+
+        fprintf(fp, "Is Active   : %d\n", services[i].isActive);
+        // In trạng thái (1 = hoạt động, 0 = ngưng)
+
+        fprintf(fp, "-----------------------------------\n");
+        // Dòng phân cách (QUAN TRỌNG: phải giống format load)
+    }
+
+    fclose(fp);
     // Đóng file
 
-    return 1; 
-    // Thành công
+    return 1;
 }
 
 int loadServices(void) {
-    /* TODO: Tương tự loadCustomers cho services[] / FILE_SERVICES */
-<<<<<<< HEAD
-   FILE *fp = fopen(FILE_SERVICES, "rb"); 
-=======
-   FILE *fp = fopen(FILE_SERVICES, "r+"); 
->>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
-    // Mở file services
+    FILE *fp = fopen(FILE_SERVICES, "r");
+    if (!fp) return 0;
 
-    if (!fp) {
-        printError("Khong mo duoc file!"); // Không mở được file thì có thể là lần đầu chạy chưa có file
-        return 0; 
+    char line[256];
+    serviceCount = 0;
+
+    while (fgets(line, sizeof(line), fp)) {
+
+        // Tìm dòng bắt đầu của 1 service
+        if (strncmp(line, "Service ID", 10) == 0) {
+
+            if (serviceCount >= MAX_SERVICES) break;
+
+            Service *s = &services[serviceCount];
+
+            // --- Service ID ---
+            sscanf(line, "Service ID  : %s", s->serviceId);
+
+            // --- Name ---
+            if (fgets(line, sizeof(line), fp)) {
+                sscanf(line, "Name        : %[^\n]", s->name);
+            }
+
+            // --- Unit Price ---
+            if (fgets(line, sizeof(line), fp)) {
+                sscanf(line, "Unit Price  : %lf", &s->unitPrice);
+            }
+
+            // --- Is Active ---
+            if (fgets(line, sizeof(line), fp)) {
+                sscanf(line, "Is Active   : %d", &s->isActive);
+            }
+
+            // --- Skip dòng gạch ---
+            fgets(line, sizeof(line), fp);
+
+            serviceCount++;
+        }
     }
 
-    fread(&serviceCount, sizeof(int), 1, fp); 
-    // Đọc số lượng dịch vụ đã lưu trước đó
-
-    fread(services, sizeof(Service), serviceCount, fp); 
-    // Đọc toàn bộ mảng services từ file vào RAM
-    fclose(fp); 
-    // Đóng file
-
-    return 1; 
-    // Load thành công
+    fclose(fp);
+    return 1;
 }
 
 void loadAllData(void) {
-    /* TODO: Gọi loadCustomers(), loadServices(), loadOrders() */
-    loadCustomers();
+    
+	loadCustomers();
     loadServices();
     loadOrders();
 }
 
 
 void saveAllData(void) {
-    /* TODO: Gọi saveCustomers(), saveServices(), saveOrders() */
     
 	saveCustomers(); 
-    // Lưu khách hàng
-
     saveServices();  
-    // Lưu dịch vụ
-
     saveOrders();    
-    // Lưu phiếu sửa
 }
 
 /* =========================================================
@@ -1012,7 +1051,6 @@ int addService(void) {
      * 6. saveServices(); printSuccess(); return 1;
      */
     /* 1. Kiểm tra giới hạn mảng */
-    
     if (serviceCount >= MAX_SERVICES) {
         printError("He thong da day, khong the them dich vu moi.");
         return 0;
@@ -1091,6 +1129,7 @@ int editService(void) {
     printf("  Dich vu dang chon: %s - %s\n", services[idx].serviceId, services[idx].name);
     printf("  [1] Sua ten dich vu\n");
     printf("  [2] Sua don gia\n");
+    printf("  [3] Kich hoat/Tam ngung dich vu\n");
     printf("  [0] Huy\n");
     printf("  Lua chon: ");
     scanf("%d", &choice);
@@ -1125,7 +1164,12 @@ int editService(void) {
         } while (newPrice <= 0);
         services[idx].unitPrice = newPrice;
 
-    } else if (choice == 0) {
+    } 
+    else if (choice == 3) {
+        services[idx].isActive = !services[idx].isActive;
+        printf("  Dich vu da duoc %s.\n", services[idx].isActive ? "kich hoat" : "tam ngung");
+    }
+    else if (choice == 0) {
         printf("  Da huy thao tac.\n");
         return 0;
     } else {
@@ -1143,7 +1187,7 @@ int editService(void) {
 int findServiceById(const char *serviceId) {
     int index = -1;
     for(int i = 0; i < serviceCount; i++){
-        if(strcmp(services[i].serviceId, serviceId) == 0 && services[i].isActive == 1){
+        if(strcmp(services[i].serviceId, serviceId) == 0){
             index = i;
             break;
         }
@@ -1156,41 +1200,35 @@ void listAllServices(void) {
      * In header: STT | Mã DV | Tên dịch vụ | Đơn giá
      * Duyệt for, chỉ in isActive == 1; dùng formatMoney cho đơn giá
      */
-    /* Đếm xem có bao nhiêu dịch vụ đang Active */
-    //serviceCount = 10;
     int activeCount = 0;
     for (int i = 0; i < serviceCount; i++) {
-        if (services[i].isActive == 1) activeCount++;
+        if (services[i].isActive == 1) {
+            activeCount++;
+        }
     }
 
-<<<<<<< HEAD
-    if (activeCount == 0) {
-        printf("  Chua co dich vu nao hoat dong trong he thong.\n");
-=======
 
     if (serviceCount == 0) {
-        printf("  Chua co dich vu nao trong he thong.\n");
->>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
+        printError("Chua co dich vu nao trong he thong!");
         return;
     }
 
     /* In Header */
     printDivider();
-    printf("  %-4s %-10s %-30s %-20s\n", "STT", "Ma DV", "Ten dich vu", "Don gia");
+    printf("  %-4s %-10s %-30s %-20s %-20s\n", "STT", "Ma DV", "Ten dich vu", "Don gia", "Trang thai");
     printDivider();
 
 
     int stt = 1;
     for (int i = 0; i < serviceCount; i++) {
-        if (services[i].isActive == 1) {
-            char priceBuf[30];
-            formatMoney(services[i].unitPrice, priceBuf); 
-            printf("  %-4d %-10s %-30s %-20s\n",
-                   stt++,
-                   services[i].serviceId,
-                   services[i].name,
-                   priceBuf);
-        }
+        char priceBuf[30];
+        formatMoney(services[i].unitPrice, priceBuf); 
+        printf("  %-4d %-10s %-30s %-20s %-20s\n",
+                stt++,
+                services[i].serviceId,
+                services[i].name,
+                priceBuf,
+                services[i].isActive ? "Hoat dong" : "Khong hoat dong");
     }
     printDivider();
     printf("  Tong so dich vu dang hoat dong: %d\n", activeCount);
