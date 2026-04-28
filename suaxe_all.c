@@ -39,8 +39,8 @@
 #define STATUS_DONE      2   /* Hoàn thành */
 
 /* --- Đường dẫn file --- */
-#define FILE_CUSTOMERS "none.txt"
-#define FILE_ORDERS    "chuaco.txt"
+#define FILE_CUSTOMERS "customers.txt"
+#define FILE_ORDERS    "orders.txt"
 #define FILE_SERVICES  "services.txt"
 
 /* --- Màu ANSI --- */
