@@ -515,7 +515,11 @@ int saveCustomers(void) {
      * return 1;
      */
     
+<<<<<<< HEAD
     FILE *fp = fopen(FILE_CUSTOMERS, "wb"); 
+=======
+    FILE *fp = fopen(FILE_CUSTOMERS, "w+"); 
+>>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
     /*
 	Mở file ở chế độ ghi nhị phân (chọn ghi nhị phân là vì mình dùng fwrite và nhóm dùng fwrite vì nó tối ưu hơn về tốc độ, ít lỗi hơn khi làm việc 
 	với struct)
@@ -545,7 +549,11 @@ int saveCustomers(void) {
 }
 
 int loadCustomers(void) {
+<<<<<<< HEAD
     FILE *fp = fopen(FILE_CUSTOMERS, "rb");
+=======
+    FILE *fp = fopen(FILE_CUSTOMERS, "r+");
+>>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
     if (!fp) return 0; 
     
     fread(&customerCount, sizeof(int), 1, fp);
@@ -559,7 +567,11 @@ int loadCustomers(void) {
 int saveOrders(void) {
     /* TODO: Tương tự saveCustomers cho orders[] / FILE_ORDERS */
     
+<<<<<<< HEAD
 	FILE *fp = fopen(FILE_ORDERS, "wb"); 
+=======
+	FILE *fp = fopen(FILE_ORDERS, "w+"); 
+>>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
     // Mở file orders.dat ở chế độ ghi nhị phân (giải thích tương tự hàm saveCustomers)
     // Nếu chưa có thì tạo mới, nếu có rồi thì ghi đè lên
 
@@ -583,7 +595,11 @@ int saveOrders(void) {
 }
 
 int loadOrders(void) {
+<<<<<<< HEAD
     FILE *fp = fopen(FILE_ORDERS, "rb");
+=======
+    FILE *fp = fopen(FILE_ORDERS, "r+");
+>>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
     if (!fp) return 0; 
     
     fread(&orderCount, sizeof(int), 1, fp);
@@ -596,7 +612,11 @@ int loadOrders(void) {
 int saveServices(void) {
     /* TODO: Tương tự saveCustomers cho services[] / FILE_SERVICES */
     
+<<<<<<< HEAD
 	FILE *fp = fopen(FILE_SERVICES, "wb"); 
+=======
+	FILE *fp = fopen(FILE_SERVICES, "w+"); 
+>>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
     // Mở file services.dat ở chế độ ghi nhị phân
 
     if (!fp) {
@@ -620,7 +640,11 @@ int saveServices(void) {
 
 int loadServices(void) {
     /* TODO: Tương tự loadCustomers cho services[] / FILE_SERVICES */
+<<<<<<< HEAD
    FILE *fp = fopen(FILE_SERVICES, "rb"); 
+=======
+   FILE *fp = fopen(FILE_SERVICES, "r+"); 
+>>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
     // Mở file services
 
     if (!fp) {
@@ -1139,8 +1163,14 @@ void listAllServices(void) {
         if (services[i].isActive == 1) activeCount++;
     }
 
+<<<<<<< HEAD
     if (activeCount == 0) {
         printf("  Chua co dich vu nao hoat dong trong he thong.\n");
+=======
+
+    if (serviceCount == 0) {
+        printf("  Chua co dich vu nao trong he thong.\n");
+>>>>>>> parent of a72797a (Cường fix lại toàn bộ hệ thống load và save file và test lại toàn bộ chương trình)
         return;
     }
 
