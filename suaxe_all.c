@@ -1134,6 +1134,7 @@ void listAllServices(void) {
      */
     /* Đếm xem có bao nhiêu dịch vụ đang Active */
     //serviceCount = 10;
+    int activeCount = 0;
     for (int i = 0; i < serviceCount; i++) {
         if (services[i].isActive == 1) activeCount++;
     }
