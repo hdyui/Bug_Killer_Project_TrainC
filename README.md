@@ -41,20 +41,3 @@ Data Persistence
 All data saved to binary files after every operation
 Auto-loaded on startup — no data loss on unexpected shutdown
 
-
-🗂️ Project Structure
-QuanLySuaXe/
-├── main.c          # Entry point, main menu, sub-menu navigation
-├── customer.h/.c   # Customer add, edit, search logic
-├── service.h/.c    # Service catalog management
-├── repair.h/.c     # Repair order creation, status update, search
-├── fileio.h/.c     # Binary file read/write for all data types
-├── report.h/.c     # Revenue stats, invoice export
-├── utils.h/.c      # Shared helpers: validate, format, generate ID
-├── models.h        # All struct definitions (Customer, RepairOrder, Service)
-├── constants.h     # System-wide constants, limits, ANSI colors
-├── Makefile        # Build configuration
-└── data/
-    ├── customers.bin
-    ├── orders.bin
-    └── services.bin
