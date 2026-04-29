@@ -1305,7 +1305,9 @@ int createRepairOrder(void) {
         printf("Nhap ma dich vu can them vao phieu (VD: SV000001), nhap 0 de ket thuc: ");
         scanf("%[^\n]", serviceId);
         while (getchar() != '\n');
-        
+        if(strcmp(serviceId, "0") == 0){
+            break;
+        }
         int serviceIdx = findServiceById(serviceId);
         if(serviceIdx == -1 || services[serviceIdx].isActive == 0){
             printf("Khong tim thay dich vu hoac dich vu khong hoat dong.\n");
@@ -1314,7 +1316,7 @@ int createRepairOrder(void) {
         addItemToOrder(orderCount, serviceIdx);
         
     }
-    while(strcmp(serviceId, "0") != 0);
+    while(1);
         
     orderCount++;
     customers[index].orderCount++;

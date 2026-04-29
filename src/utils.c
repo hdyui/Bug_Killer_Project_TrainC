@@ -33,24 +33,34 @@ int isValidPhone(const char *phone) {
 }
 
 int isValidPlate(const char *plate) {
-    /* TODO:
-     * 1. Kiểm tra plate không NULL và không rỗng
-     * 2. Kiểm tra độ dài hợp lý (ví dụ 6-12 ký tự)
-     * 3. Trả về 1 nếu hợp lệ, 0 nếu không
-     */
-    if (plate == NULL) return 0;
-    /* 65AA-123.45 => độ dài = 10 */
-    if (strlen(plate) != 11) return 0;
-    if (!isdigit(plate[0])) return 0;
-    if (!isdigit(plate[1])) return 0;
+    if (!plate) return 0;
+
+    int len = strlen(plate);
+
+    // cho phép thêm dấu '.' nên len có thể 9 hoặc 10
+    if (len < 9 || len > 10) return 0;
+
+    // 2 số đầu (mã tỉnh)
+    if (!isdigit(plate[0]) || !isdigit(plate[1])) return 0;
+
+    // 1 chữ cái
     if (!isalpha(plate[2])) return 0;
-    if (!isalpha(plate[3])) return 0;
-    if (plate[4] != '-')    return 0;
-    if (!isdigit(plate[5])) return 0;
-    if (!isdigit(plate[6])) return 0;
-    if (!isdigit(plate[7])) return 0;
-    if (plate[8] != '.')    return 0;
-    if (!isdigit(plate[9])) return 0;
+
+    // dấu '-'
+    if (plate[3] != '-') return 0;
+
+    int digitCount = 0;
+
+    for (int i = 4; i < len; i++) {
+        if (plate[i] == '.') continue; 
+
+        if (!isdigit(plate[i])) return 0;
+        digitCount++;
+    }
+
+    // phải đủ 5 số
+    if (digitCount != 5) return 0;
+
     return 1;
 }
 int isValidName(const char *name) {
