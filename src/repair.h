@@ -35,7 +35,7 @@ int createRepairOrder(void);
  * Cập nhật totalAmount của phiếu.
  * Trả về 1 thành công, 0 thất bại (phiếu đã đầy hoặc dịch vụ không tồn tại).
  */
-int addItemToOrder(int idx);
+int addItemToOrder(int orderIdx, int serviceIdx);
 
 /* --- Cập nhật trạng thái --- */
 

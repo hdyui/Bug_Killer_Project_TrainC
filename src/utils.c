@@ -10,8 +10,7 @@
 #include "utils.h"
 #include "constants.h"
 #include "models.h"
-extern Customer customers[MAX_CUSTOMERS];
-extern int customerCount;
+
 
 /* =========================================================
  * VALIDATE
@@ -76,11 +75,8 @@ void generateCustomerId(int n, char *buffer) {
 
 }
 
-void generateOrderId(int n, char *buffer) {
-    /* TODO:
-     * Dùng snprintf để định dạng: "RO%06d" với n
-     * VD: n=1 -> "RO000001"
-     */
+void generateOrderId() {
+    sprintf(orders[orderCount].orderId,"RO%06d", orderCount + 1);
 }
 
 void generateServiceId(int n, char *buffer) {

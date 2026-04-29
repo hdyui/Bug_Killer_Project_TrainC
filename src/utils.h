@@ -2,7 +2,12 @@
 #define UTILS_H
 
 #include <time.h>
-
+extern Customer customers[MAX_CUSTOMERS];
+extern int customerCount;
+extern RepairOrder orders[MAX_REPAIR_ORDERS];
+extern int orderCount;
+extern Service services[MAX_SERVICES];
+extern int serviceCount;
 /* =========================================================
  * utils.h - Khai báo các hàm tiện ích dùng chung
  * ========================================================= */
@@ -50,7 +55,7 @@ void generateCustomerId();
 /*
  * Sinh mã phiếu sửa dạng "RO000001" từ số thứ tự n.
  */
-void generateOrderId(int n, char *buffer);
+void generateOrderId();
 
 /*
  * Sinh mã dịch vụ dạng "SV000001" từ số thứ tự n.
