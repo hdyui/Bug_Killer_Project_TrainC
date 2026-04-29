@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <time.h>
+#include "models.h"
 extern Customer customers[MAX_CUSTOMERS];
 extern int customerCount;
 extern RepairOrder orders[MAX_REPAIR_ORDERS];
@@ -25,6 +26,7 @@ int isValidPhone(const char *phone);
  * Trả về 1 nếu hợp lệ, 0 nếu không.
  */
 int isValidPlate(const char *plate);
+int isValidName(const char *name);
 
 /* --- Chuỗi --- */
 
@@ -60,7 +62,7 @@ void generateOrderId();
 /*
  * Sinh mã dịch vụ dạng "SV000001" từ số thứ tự n.
  */
-void generateServiceId(int n, char *buffer);
+void generateServiceId();
 
 /* --- Thời gian --- */
 
@@ -81,6 +83,8 @@ void getTodayString(char *buffer);
 /*
  * In đường kẻ ngang cho menu/bảng.
  */
+char * getStatusString(int status);
+
 void printDivider(void);
 
 /*

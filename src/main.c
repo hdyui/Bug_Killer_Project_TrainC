@@ -26,12 +26,12 @@ int main(void) {
     int choice;
 
     /* Khởi tạo bộ nhớ */
-    initCustomers();
-    initServices();
-    initOrders();
+    // initCustomers();
+    // initServices();
+    // initOrders();
 
     /* Đảm bảo thư mục data/ tồn tại rồi tải dữ liệu */
-    ensureDataDir();
+    // ensureDataDir();
     loadAllData();
 
     /* Menu chính - vòng lặp chính của chương trình */
