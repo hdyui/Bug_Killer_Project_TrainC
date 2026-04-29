@@ -12,7 +12,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include <sys/stat.h>
 
 
 /* =========================================================
@@ -1804,9 +1803,6 @@ static void menuService(void) {
 
 int main(void) {
     int choice;
-
-    initCustomers();
-    initServices();
 
     loadAllData();
 

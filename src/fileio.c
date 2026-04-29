@@ -3,7 +3,6 @@
  * ========================================================= */
 
 #include <stdio.h>
-#include <sys/stat.h>
 #include "fileio.h"
 #include "customer.h"
 #include "repair.h"
