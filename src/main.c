@@ -122,12 +122,21 @@ static void menuRepair(void) {
             case 1: createRepairOrder();  break;
             case 2: updateOrderStatus();  break;
             case 3: {
-                /* TODO: Nhập orderId rồi gọi findOrderById + printOrder */
+                char oid[ID_LEN];
+                printf("  Nhap ma phieu: ");
+                readLine(oid, ID_LEN);
+                int idx = findOrderById(oid);
+                if (idx == -1) printError("Khong tim thay phieu.");
+                else printOrder(&orders[idx]);
                 break;
             }
             case 4: listOrders(-1);       break;
             case 5: {
-                /* TODO: Hỏi trạng thái muốn lọc (0/1/2) rồi gọi listOrders(status) */
+                int st;
+                printf("  Trang thai [0=Tiep nhan, 1=Dang sua, 2=Hoan thanh]: ");
+                scanf(" %d", &st);
+                while (getchar() != '\n');
+                listOrders(st);
                 break;
             }
             case 6: viewCustomerHistory(); break;

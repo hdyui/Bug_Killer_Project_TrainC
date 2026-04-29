@@ -1323,7 +1323,8 @@ int createRepairOrder(void) {
 
 
     
-
+    saveOrders();
+    saveCustomers();
     printf("Tao phieu thanh cong\n");
     return status;
 }

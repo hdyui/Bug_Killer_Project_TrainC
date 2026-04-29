@@ -124,8 +124,8 @@ int createRepairOrder(void) {
         
     orderCount++;
     customers[index].orderCount++;
-
-
+    saveOrders();
+    saveCustomers();
     
 
     printf("Tao phieu thanh cong\n");
