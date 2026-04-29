@@ -26,9 +26,9 @@
 #define STATUS_DONE       2   /* Hoàn thành */
 
 /* --- Đường dẫn file dữ liệu --- */
-#define FILE_CUSTOMERS    "data/customers.dat"
-#define FILE_ORDERS       "data/orders.dat"
-#define FILE_SERVICES     "data/services.dat"
+#define FILE_CUSTOMERS    "customers.txt"
+#define FILE_ORDERS       "orders.txt"
+#define FILE_SERVICES     "services.txt"
 
 /* --- Màu ANSI (tùy chọn) --- */
 #define COLOR_RESET   "\033[0m"
