@@ -12,8 +12,8 @@
 
 /* --- Định nghĩa bộ nhớ toàn cục --- */
 
-extern Customer customers[MAX_CUSTOMERS];
-extern int customerCount;
+Customer customers[MAX_CUSTOMERS];
+int customerCount = 0;
 
 
 /* =========================================================
